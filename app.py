@@ -1,51 +1,132 @@
+import telebot
+import random
+from openpyxl import load_workbook
 
-import re
-import requests
-import json
+CHAVE_API = "7026978984:AAFxq_Qo4nuQG-J9B5yZYPbHGrQy8xMofnc"
 
-class TelegramBot:
-  def __init__(self):
-    token = '7026978984:AAFxq_Qo4nuQG-J9B5yZYPbHGrQy8xMofnc'
-    self.url_base = f'https://api.telegram.org/bot{token}/'
+bot = telebot.TeleBot(CHAVE_API)
 
-  #iniciar o bot
-  def Iniciar(self, update_id, chat_id):
-    while True: 
-        atualizacao = self.obter_mensagens(update_id)
-        mensagens = atualizacao['result']
-        if mensagens:
-            for mensagem in mensagens:
-                update_id = mensagem['update_id']
-                chat_id = mensagem['message']['from']['id']
-                mensagembot = mensagem['message']['text']
-            return mensagembot, chat_id, update_id
-          
-  #obter mensagens
-  def obter_mensagens(self, update_id):
-    link_requisicao = f'{self.url_base}getUpdates?timeout=100'
-    if update_id:
-      link_requisicao = f'{link_requisicao}&offset={update_id + 1}' 
-    resultado = requests.get(link_requisicao)
-    return json.loads(resultado.content)
+def verificar(mensagem):
+    return True
 
-#criar resposta
+def receberFrases():
+    planilha = load_workbook('Frases Ingles.xlsx')
+    aba_ativa = planilha.active
+    QtdFrases = len(aba_ativa['A'])
+    number = random.randint(0, QtdFrases+1)
+    frase = [aba_ativa[f'B{number}'].value, aba_ativa[f'C{number}'].value, aba_ativa[f'D{number}'].value]
+    return frase
+        
 
-  def responder(self, resposta, chat_id):
-     #enviar
-    link_de_envio = f'{self.url_base}sendMessage?chat_id={chat_id}&text={resposta}'
-    requests.get(link_de_envio)
+def exibirFrase(usuario):
+    frase = receberFrases()
+    usuario[1] = frase[0]
+    usuario[2] = frase[1]
+    usuario[3] = frase[2]
 
-user = TelegramBot()
-update_id = None
-chat_id = None
-lista_chat_id = ['425']
+    responder(usuario[0], f'Frase de Nível {usuario[3]}: \n{usuario[1]}')
+    return usuario
 
-while True:
-    mensagem, chat_id, update_id = user.Iniciar(update_id, chat_id)
-    for id in lista_chat_id:
-        if id == chat_id:
-            print('ja tem')
-        else:
-            resposta = 'Ola'
-    lista_chat_id.append(id)
-    user.responder(resposta, chat_id)
+def exibirTraducao(usuario):
+    pass
+
+def AlterarNivel(usuario):
+    pass
+
+def exibirMenu(usuario):
+    resposta = f'Menu \n/Exibir'
+    responder(usuario[0], resposta)
+
+def verficarComando(mensagem, usuario):
+    if mensagem == '/Exibir':
+        usuario = exibirFrase(usuario)
+        return usuario
+    
+    elif mensagem == '/Traducao':
+        exibirTraducao(usuario)
+    
+    elif mensagem == '/Nivel':
+        AlterarNivel(usuario)
+
+    elif mensagem == '/Basico':
+        AlterarNivel(usuario)
+    
+    elif mensagem == '/BasicoAvancado':
+        AlterarNivel(usuario)
+    
+    elif mensagem == '/Intermediario':
+        AlterarNivel(usuario)
+    
+    elif mensagem == '/IntermediarioAvancado':
+        AlterarNivel(usuario)
+    
+    elif mensagem == '/Fluente':
+        AlterarNivel(usuario)
+
+    else: 
+        exibirMenu(usuario)
+
+def verificarUsuario(id):
+    listaUsersId = receberListaUser()
+    if id in listaUsersId:
+        return True
+    else: return False
+
+def receberListaUser():
+    lista_id = []
+    planilha = load_workbook('Usuarios.xlsx')
+    aba_ativa = planilha.active
+    for celula in aba_ativa['A']:
+      if type(celula.value) == int :
+        lista_id.append(celula.value)
+    return lista_id
+
+def UserInfo(id, mensagem):
+    frase = 'meu amigo'
+    traducao = 'my friend'
+    nivel = 'basico'
+    return [id, frase, traducao, nivel]
+
+def registrarUsuario(usuario):
+    planilha = load_workbook('Usuarios.xlsx')
+    aba_ativa = planilha.active
+    linha = len(aba_ativa['A'])+1
+    aba_ativa[f'A{linha}'] = usuario[0]
+    aba_ativa[f'B{linha}'] = usuario[1]
+    aba_ativa[f'C{linha}'] = usuario[2]
+    aba_ativa[f'D{linha}'] = usuario[3]
+    planilha.save('Usuarios.xlsx')
+
+
+def responder(id, resposta):
+    bot.send_message(id, resposta)
+
+
+@bot.message_handler(func=verificar)
+def receber(mensagem):
+
+    id = mensagem.chat.id
+    mensagemUser = mensagem.text
+
+    if verificarUsuario(id):
+        print('Usuario existente')
+        usuario = UserInfo(id, mensagem)
+        #
+        #
+        #
+        #
+        #
+        #
+        #
+        #
+        # user info que tem q arrumar agora
+    else:
+        print('Usuario novo')
+        usuario = [id, None, None, None]
+
+    usuario = verficarComando(mensagemUser, usuario)
+    registrarUsuario(usuario)
+    exibirMenu(usuario)
+
+bot.polling()
+
