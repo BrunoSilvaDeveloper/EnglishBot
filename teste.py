@@ -34,7 +34,13 @@ def receberFrases():
 
 frase = receberFrases()
 print(frase)
-'''
+
 for n in range(0,10):
     numbers = [1,2]
     print(numbers[random.randint(0,1)])
+'''
+
+mensagem = 'Ola! estou aqui.'
+mensagem = mensagem.replace('.', '\.')
+mensagem = mensagem.replace('!', '\!')
+print(mensagem)

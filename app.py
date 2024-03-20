@@ -1,5 +1,6 @@
 import telebot
 import random
+import emoji
 from openpyxl import load_workbook
 
 CHAVE_API = "7026978984:AAFxq_Qo4nuQG-J9B5yZYPbHGrQy8xMofnc"
@@ -33,7 +34,11 @@ def exibirFrase(usuario):
     usuario[2] = frase[1]
     usuario[3] = frase[2]
 
-    responder(usuario[0], f'Frase de Nível {usuario[3]}: \n{usuario[1]}')
+ 
+    mensagem = usuario[1].replace('.', '\.')
+    mensagem = mensagem.replace('!', '\!')
+    mensagem = mensagem.replace('-', '\-')
+    responder(usuario[0], f'*Frase de Nível:   {usuario[3]}*🔥 \n\n_Esta é a sua frase, bons estudos\!_\n\n{mensagem} \n\n*_Clique aqui para continuar\.\.\. 👉 /OK_*')
     return usuario
 
 def exibirHistoria(usuario):
@@ -42,41 +47,42 @@ def exibirHistoria(usuario):
     usuario[2] = frase[1]
     usuario[3] = frase[2]
 
-    responder(usuario[0], f'Frase de Nível {usuario[3]}: \n{usuario[1]}')
+    mensagem = usuario[1].replace('.', '\.')
+    mensagem = mensagem.replace('!', '\!')
+    mensagem = mensagem.replace('-', '\-')
+    responder(usuario[0], f'*História de Nível:   {usuario[3]}*🔥 \n\n_Esta é a sua história, bons estudos\!_\n\n{mensagem} \n\n*_Clique aqui para continuar\.\.\. 👉 /OK_*')
     return usuario
 
 def exibirTraducao(usuario):
-    resposta = usuario[2]
-    responder(usuario[0], resposta)
+    mensagem = usuario[2].replace('.', '\.')
+    mensagem = mensagem.replace('!', '\!')
+    responder(usuario[0], f'_Esta é a sua tradução, espero que tenha acertado\! 😊_ \n\n{mensagem} \n\n*_Clique aqui para continuar\.\.\. 👉 /OK_*')
 
 def AlterarNivel(usuario, nivel):
     if nivel == 'Nivel':
-        resposta = f'Escolha seu nível: \n/Basico \n/BasicoAvancado \n/Intermediario \n/IntermediarioAvancado \n/Fluente'
+        resposta = f'Escolha seu nível 🤗 \n\n*Nível Básico* \nClique aqui 👉 _/Basico_ \n\n*Nível Básico Avançado* \nClique aqui 👉 _/BasicoAvancado_ \n\n*Nível Intemediário* \nClique aqui 👉 _/Intermediario_ \n\n*Nível Intermediário Avançado* \nClique aqui 👉 _/IntermediarioAvancado_ \n\n*Nível Fluente* \nClique aqui 👉 _/Fluente_'
         responder(usuario[0], resposta)
     
     else:
         usuario[3] = nivel
-        resposta = f'Seu nível foi alterado para: {nivel}'
+        resposta = f'Seu nível foi alterado para _*{nivel}*_ 😉 \n\n*_Clique aqui para continuar\.\.\. 👉 /OK_*'
         responder(usuario[0], resposta)
 
     return usuario
 
 def exibirMenu(usuario):
-    resposta = f'Menu \n/Frase \n/Historia \n/Traducao \n/Nivel'
+    resposta = f'Olá, seja muito bem vindo\! 👋 \n\n_Este é o nosso Menu 🏠_ \n\nExibir uma *frase*, clique aqui 👉 _/Frase_ \nExibir uma *história*, clique aqui 👉 _/Historia_ \nExibir a *tradução*, clique aqui 👉 _/Traducao_ \nAlterar o seu *nível*, clique aqui 👉 _/Nivel_ \n\nPara entender nosso *Propósito* \nClique aqui 👉 _/Proposito_'
     responder(usuario[0], resposta)
 
 def verficarComando(mensagem, usuario):
     if mensagem == '/Frase':
         usuario = exibirFrase(usuario)
-        exibirMenu(usuario)
     
     elif mensagem == '/Historia':
         usuario = exibirHistoria(usuario)
-        exibirMenu(usuario)
     
     elif mensagem == '/Traducao':
         exibirTraducao(usuario)
-        exibirMenu(usuario)
     
     elif mensagem == '/Nivel':
         nivel = 'Nivel'
@@ -85,27 +91,30 @@ def verficarComando(mensagem, usuario):
     elif mensagem == '/Basico':
         nivel = 'Básico'
         usuario = AlterarNivel(usuario, nivel)
-        exibirMenu(usuario)
     
     elif mensagem == '/BasicoAvancado':
         nivel = 'Básico Avançado'
         usuario = AlterarNivel(usuario, nivel)
-        exibirMenu(usuario)
     
     elif mensagem == '/Intermediario':
         nivel = 'Intermediário'
         usuario = AlterarNivel(usuario, nivel)
-        exibirMenu(usuario)
     
     elif mensagem == '/IntermediarioAvancado':
         nivel = 'Intermediário Avançado'
         usuario = AlterarNivel(usuario, nivel)
-        exibirMenu(usuario)
     
     elif mensagem == '/Fluente':
         nivel = 'Fluente'
         usuario = AlterarNivel(usuario, nivel)
-        exibirMenu(usuario)
+    
+    elif mensagem == '/Proposito':
+        resposta = f'*Olá, que bom que queira saber mais de nós 😊 \n\n_Nosso propósito é ajudar você a treinar e colocar em prática seus estudos de inglês. Eu forneço frases e histórias com o objetivo de você tentar traduzi-las. Depois, você pode verificar se acertou solicitando a tradução da frase ou história. \n\nNós surgimos da necessidade de um lugar onde pudéssemos treinar nossos aprendizados de forma prática, traduzindo pequenos textos ou frases, mas que estes estivessem no nosso nível de aprendizado. Muitas das vezes, outros lugares que tinham essas frases e histórias, não possuíam um nível equivalente ao nosso aprendizado. Dai eu surgi, com o objetivo de te ajudar a aprender cada vez mais. \n\nFico muito feliz de tê-lo por aqui! 😊😊_* \n\n*_Clique aqui para continuar... 👉 /OK_*'
+        resposta = resposta.replace('.', '\.')
+        resposta = resposta.replace('!', '\!')
+        resposta = resposta.replace('-', '\-')
+        print(resposta)
+        responder(usuario[0], resposta)
 
     else:
         exibirMenu(usuario)
@@ -155,7 +164,7 @@ def AlterarUsuario(usuario, linha):
     planilha.save('Usuarios.xlsx')
 
 def responder(id, resposta):
-    bot.send_message(id, resposta)
+    bot.send_message(id, resposta, parse_mode="MarkdownV2")
 
 @bot.message_handler(func=verificar)
 def receber(mensagem):
