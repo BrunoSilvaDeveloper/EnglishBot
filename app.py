@@ -113,7 +113,6 @@ def verficarComando(mensagem, usuario):
         resposta = resposta.replace('.', '\.')
         resposta = resposta.replace('!', '\!')
         resposta = resposta.replace('-', '\-')
-        print(resposta)
         responder(usuario[0], resposta)
 
     else:
