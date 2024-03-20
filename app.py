@@ -28,43 +28,55 @@ def exibirFrase(usuario):
     return usuario
 
 def exibirTraducao(usuario):
-    pass
+    resposta = usuario[2]
+    responder(usuario[0], resposta)
+    return usuario
 
 def AlterarNivel(usuario):
     pass
 
 def exibirMenu(usuario):
-    resposta = f'Menu \n/Exibir'
+    resposta = f'Menu \n/Exibir \n/Traducao'
     responder(usuario[0], resposta)
 
 def verficarComando(mensagem, usuario):
     if mensagem == '/Exibir':
         usuario = exibirFrase(usuario)
+        exibirMenu(usuario)
         return usuario
     
     elif mensagem == '/Traducao':
         exibirTraducao(usuario)
+        exibirMenu(usuario)
+        return usuario
     
     elif mensagem == '/Nivel':
         AlterarNivel(usuario)
+        exibirMenu(usuario)
 
     elif mensagem == '/Basico':
         AlterarNivel(usuario)
+        exibirMenu(usuario)
     
     elif mensagem == '/BasicoAvancado':
         AlterarNivel(usuario)
+        exibirMenu(usuario)
     
     elif mensagem == '/Intermediario':
         AlterarNivel(usuario)
+        exibirMenu(usuario)
     
     elif mensagem == '/IntermediarioAvancado':
         AlterarNivel(usuario)
+        exibirMenu(usuario)
     
     elif mensagem == '/Fluente':
         AlterarNivel(usuario)
+        exibirMenu(usuario)
 
     else: 
         exibirMenu(usuario)
+        return usuario
 
 def verificarUsuario(id):
     listaUsersId = receberListaUser()
@@ -81,16 +93,32 @@ def receberListaUser():
         lista_id.append(celula.value)
     return lista_id
 
-def UserInfo(id, mensagem):
-    frase = 'meu amigo'
-    traducao = 'my friend'
-    nivel = 'basico'
-    return [id, frase, traducao, nivel]
+def UserInfo(id):
+    planilha = load_workbook('Usuarios.xlsx')
+    aba_ativa = planilha.active
+    for celula in aba_ativa['A']:
+        if type(celula.value) == int :
+            if celula.value == id:
+                linha = celula.row
+                frase = aba_ativa[f'B{linha}'].value
+                traducao = aba_ativa[f'C{linha}'].value
+                nivel = aba_ativa[f'D{linha}'].value
+                return [id, frase, traducao, nivel], linha
+            
 
 def registrarUsuario(usuario):
     planilha = load_workbook('Usuarios.xlsx')
     aba_ativa = planilha.active
     linha = len(aba_ativa['A'])+1
+    aba_ativa[f'A{linha}'] = usuario[0]
+    aba_ativa[f'B{linha}'] = usuario[1]
+    aba_ativa[f'C{linha}'] = usuario[2]
+    aba_ativa[f'D{linha}'] = usuario[3]
+    planilha.save('Usuarios.xlsx')
+
+def AlterarUsuario(usuario, linha):
+    planilha = load_workbook('Usuarios.xlsx')
+    aba_ativa = planilha.active
     aba_ativa[f'A{linha}'] = usuario[0]
     aba_ativa[f'B{linha}'] = usuario[1]
     aba_ativa[f'C{linha}'] = usuario[2]
@@ -110,23 +138,17 @@ def receber(mensagem):
 
     if verificarUsuario(id):
         print('Usuario existente')
-        usuario = UserInfo(id, mensagem)
-        #
-        #
-        #
-        #
-        #
-        #
-        #
-        #
-        # user info que tem q arrumar agora
+        usuario, linha = UserInfo(id)
     else:
         print('Usuario novo')
         usuario = [id, None, None, None]
+        registrarUsuario(usuario)
+        usuario, linha = UserInfo(id)
 
     usuario = verficarComando(mensagemUser, usuario)
-    registrarUsuario(usuario)
-    exibirMenu(usuario)
+    AlterarUsuario(usuario, linha)
+    print(usuario)
+    
 
 bot.polling()
 
