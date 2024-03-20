@@ -22,15 +22,19 @@ aba_ativa[f'C{linha}'] = 'Que horas são?'
 aba_ativa[f'D{linha}'] = 'Basico'
 
 planilha.save('Usuarios.xlsx')
-'''
+
 
 def receberFrases():
     planilha = load_workbook('Frases Ingles.xlsx')
-    aba_ativa = planilha.active
+    aba_ativa = planilha.get_sheet_by_name('Planilha1')
     QtdFrases = len(aba_ativa['A'])
     number = random.randint(0, QtdFrases+1)
     frase = [aba_ativa[f'B{number}'].value, aba_ativa[f'C{number}'].value, aba_ativa[f'D{number}'].value]
     return frase
 
 frase = receberFrases()
-print(frase[0])
+print(frase)
+'''
+for n in range(0,10):
+    numbers = [1,2]
+    print(numbers[random.randint(0,1)])
