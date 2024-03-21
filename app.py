@@ -1,14 +1,31 @@
 import telebot
 import random
-import emoji
 from openpyxl import load_workbook
 
-CHAVE_API = "7026978984:AAFxq_Qo4nuQG-J9B5yZYPbHGrQy8xMofnc"
+CHAVE_API = "sua chave api aqui"
 
 bot = telebot.TeleBot(CHAVE_API)
 
 def verificar(mensagem):
     return True
+
+@bot.message_handler(func=verificar)
+def receber(mensagem):
+
+    id = mensagem.chat.id
+    mensagemUser = mensagem.text
+
+    if verificarUsuario(id):
+        print('Usuario existente')
+        usuario, linha = UserInfo(id)
+    else:
+        print('Usuario novo')
+        usuario = [id, 'Não existem frases', 'Não existem frases para traduzir, peça uma!', 'Básico']
+        registrarUsuario(usuario)
+        usuario, linha = UserInfo(id)
+
+    usuario = verficarComando(mensagemUser, usuario)
+    AlterarUsuario(usuario, linha)
 
 def receberFrases(nivel, choice):
     if nivel == None:
@@ -27,52 +44,42 @@ def receberFrases(nivel, choice):
     number = random.randint(2, QtdFrases)
     frase = [aba_ativa[f'B{number}'].value, aba_ativa[f'C{number}'].value, aba_ativa[f'D{number}'].value]
     return frase
+
+def responder(id, resposta):
+    bot.send_message(id, resposta, parse_mode="MarkdownV2")   
+
+def verificarUsuario(id):
+    listaUsersId = receberListaUser()
+    if id in listaUsersId:
+        return True
+    else: return False
+
+def receberListaUser():
+    lista_id = []
+    planilha = load_workbook('Usuarios.xlsx')
+    aba_ativa = planilha.active
+    for celula in aba_ativa['A']:
+      if type(celula.value) == int :
+        lista_id.append(celula.value)
+    return lista_id
+
+def UserInfo(id):
+    planilha = load_workbook('Usuarios.xlsx')
+    aba_ativa = planilha.active
+    for celula in aba_ativa['A']:
+        if type(celula.value) == int :
+            if celula.value == id:
+                linha = celula.row
+                frase = aba_ativa[f'B{linha}'].value
+                traducao = aba_ativa[f'C{linha}'].value
+                nivel = aba_ativa[f'D{linha}'].value
+                return [id, frase, traducao, nivel], linha
         
-def exibirFrase(usuario):
-    frase = receberFrases(usuario[3], 'Frase')
-    usuario[1] = frase[0]
-    usuario[2] = frase[1]
-    usuario[3] = frase[2]
-
- 
-    mensagem = usuario[1].replace('.', '\.')
-    mensagem = mensagem.replace('!', '\!')
-    mensagem = mensagem.replace('-', '\-')
-    responder(usuario[0], f'*Frase de Nível:   {usuario[3]}*🔥 \n\n_Esta é a sua frase, bons estudos\!_\n\n{mensagem} \n\n*_Clique aqui para continuar\.\.\. 👉 /OK_*')
-    return usuario
-
-def exibirHistoria(usuario):
-    frase = receberFrases(usuario[3],'Historia')
-    usuario[1] = frase[0]
-    usuario[2] = frase[1]
-    usuario[3] = frase[2]
-
-    mensagem = usuario[1].replace('.', '\.')
-    mensagem = mensagem.replace('!', '\!')
-    mensagem = mensagem.replace('-', '\-')
-    responder(usuario[0], f'*História de Nível:   {usuario[3]}*🔥 \n\n_Esta é a sua história, bons estudos\!_\n\n{mensagem} \n\n*_Clique aqui para continuar\.\.\. 👉 /OK_*')
-    return usuario
-
-def exibirTraducao(usuario):
-    mensagem = usuario[2].replace('.', '\.')
-    mensagem = mensagem.replace('!', '\!')
-    responder(usuario[0], f'_Esta é a sua tradução, espero que tenha acertado\! 😊_ \n\n{mensagem} \n\n*_Clique aqui para continuar\.\.\. 👉 /OK_*')
-
-def AlterarNivel(usuario, nivel):
-    if nivel == 'Nivel':
-        resposta = f'Escolha seu nível 🤗 \n\n*Nível Básico* \nClique aqui 👉 _/Basico_ \n\n*Nível Básico Avançado* \nClique aqui 👉 _/BasicoAvancado_ \n\n*Nível Intemediário* \nClique aqui 👉 _/Intermediario_ \n\n*Nível Intermediário Avançado* \nClique aqui 👉 _/IntermediarioAvancado_ \n\n*Nível Fluente* \nClique aqui 👉 _/Fluente_'
-        responder(usuario[0], resposta)
-    
-    else:
-        usuario[3] = nivel
-        resposta = f'Seu nível foi alterado para _*{nivel}*_ 😉 \n\n*_Clique aqui para continuar\.\.\. 👉 /OK_*'
-        responder(usuario[0], resposta)
-
-    return usuario
-
-def exibirMenu(usuario):
-    resposta = f'Olá, seja muito bem vindo\! 👋 \n\n_Este é o nosso Menu 🏠_ \n\nExibir uma *frase*, clique aqui 👉 _/Frase_ \nExibir uma *história*, clique aqui 👉 _/Historia_ \nExibir a *tradução*, clique aqui 👉 _/Traducao_ \nAlterar o seu *nível*, clique aqui 👉 _/Nivel_ \n\nPara entender nosso *Propósito* \nClique aqui 👉 _/Proposito_'
-    responder(usuario[0], resposta)
+def registrarUsuario(usuario):
+    planilha = load_workbook('Usuarios.xlsx')
+    aba_ativa = planilha.active
+    aba_ativa.append(usuario)
+    planilha.save('Usuarios.xlsx')
 
 def verficarComando(mensagem, usuario):
     if mensagem == '/Frase':
@@ -120,38 +127,52 @@ def verficarComando(mensagem, usuario):
 
     return usuario
 
-def verificarUsuario(id):
-    listaUsersId = receberListaUser()
-    if id in listaUsersId:
-        return True
-    else: return False
+def exibirMenu(usuario):
+    resposta = f'Olá, seja muito bem vindo\! 👋 \n\n_Este é o nosso Menu 🏠_ \n\nExibir uma *frase*, clique aqui 👉 _/Frase_ \nExibir uma *história*, clique aqui 👉 _/Historia_ \nExibir a *tradução*, clique aqui 👉 _/Traducao_ \nAlterar o seu *nível*, clique aqui 👉 _/Nivel_ \n\nPara entender nosso *Propósito* \nClique aqui 👉 _/Proposito_'
+    responder(usuario[0], resposta)
 
-def receberListaUser():
-    lista_id = []
-    planilha = load_workbook('Usuarios.xlsx')
-    aba_ativa = planilha.active
-    for celula in aba_ativa['A']:
-      if type(celula.value) == int :
-        lista_id.append(celula.value)
-    return lista_id
+def exibirFrase(usuario):
+    frase = receberFrases(usuario[3], 'Frase')
+    usuario[1] = frase[0]
+    usuario[2] = frase[1]
+    usuario[3] = frase[2]
 
-def UserInfo(id):
-    planilha = load_workbook('Usuarios.xlsx')
-    aba_ativa = planilha.active
-    for celula in aba_ativa['A']:
-        if type(celula.value) == int :
-            if celula.value == id:
-                linha = celula.row
-                frase = aba_ativa[f'B{linha}'].value
-                traducao = aba_ativa[f'C{linha}'].value
-                nivel = aba_ativa[f'D{linha}'].value
-                return [id, frase, traducao, nivel], linha
-        
-def registrarUsuario(usuario):
-    planilha = load_workbook('Usuarios.xlsx')
-    aba_ativa = planilha.active
-    aba_ativa.append(usuario)
-    planilha.save('Usuarios.xlsx')
+ 
+    mensagem = usuario[1].replace('.', '\.')
+    mensagem = mensagem.replace('!', '\!')
+    mensagem = mensagem.replace('-', '\-')
+    responder(usuario[0], f'*Frase de Nível:   {usuario[3]}*🔥 \n\n_Esta é a sua frase, bons estudos\!_\n\n{mensagem} \n\n*_Clique aqui para continuar\.\.\. 👉 /OK_*')
+    return usuario
+
+def exibirHistoria(usuario):
+    frase = receberFrases(usuario[3],'Historia')
+    usuario[1] = frase[0]
+    usuario[2] = frase[1]
+    usuario[3] = frase[2]
+
+    mensagem = usuario[1].replace('.', '\.')
+    mensagem = mensagem.replace('!', '\!')
+    mensagem = mensagem.replace('-', '\-')
+    responder(usuario[0], f'*História de Nível:   {usuario[3]}*🔥 \n\n_Esta é a sua história, bons estudos\!_\n\n{mensagem} \n\n*_Clique aqui para continuar\.\.\. 👉 /OK_*')
+    return usuario
+
+def exibirTraducao(usuario):
+    mensagem = usuario[2].replace('.', '\.')
+    mensagem = mensagem.replace('!', '\!')
+    mensagem = mensagem.replace('-', '\-')
+    responder(usuario[0], f'_Esta é a sua tradução, espero que tenha acertado\! 😊_ \n\n{mensagem} \n\n*_Clique aqui para continuar\.\.\. 👉 /OK_*')
+
+def AlterarNivel(usuario, nivel):
+    if nivel == 'Nivel':
+        resposta = f'Escolha seu nível 🤗 \n\n*Nível Básico* \nClique aqui 👉 _/Basico_ \n\n*Nível Básico Avançado* \nClique aqui 👉 _/BasicoAvancado_ \n\n*Nível Intemediário* \nClique aqui 👉 _/Intermediario_ \n\n*Nível Intermediário Avançado* \nClique aqui 👉 _/IntermediarioAvancado_ \n\n*Nível Fluente* \nClique aqui 👉 _/Fluente_'
+        responder(usuario[0], resposta)
+    
+    else:
+        usuario[3] = nivel
+        resposta = f'Seu nível foi alterado para _*{nivel}*_ 😉 \n\n*_Clique aqui para continuar\.\.\. 👉 /OK_*'
+        responder(usuario[0], resposta)
+
+    return usuario
 
 def AlterarUsuario(usuario, linha):
     planilha = load_workbook('Usuarios.xlsx')
@@ -162,26 +183,5 @@ def AlterarUsuario(usuario, linha):
     aba_ativa[f'D{linha}'] = usuario[3]
     planilha.save('Usuarios.xlsx')
 
-def responder(id, resposta):
-    bot.send_message(id, resposta, parse_mode="MarkdownV2")
-
-@bot.message_handler(func=verificar)
-def receber(mensagem):
-
-    id = mensagem.chat.id
-    mensagemUser = mensagem.text
-
-    if verificarUsuario(id):
-        print('Usuario existente')
-        usuario, linha = UserInfo(id)
-    else:
-        print('Usuario novo')
-        usuario = [id, 'Não existem frases', 'Não existem frases para traduzir, peça uma!', 'Básico']
-        registrarUsuario(usuario)
-        usuario, linha = UserInfo(id)
-
-    usuario = verficarComando(mensagemUser, usuario)
-    AlterarUsuario(usuario, linha)
-    
 bot.polling()
 
