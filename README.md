@@ -28,4 +28,9 @@
 
 ##### Este ChatBot deve estar em constante atualização, por isso, novas funcionalidades ainda serão implementadas!
 
-##### Para testar, basta acessar o chat no telegram através do link: t.me/AppStudyEnglish_bot
+##### Para testar, basta acessar o chat no telegram através do link: https://t.me/AppStudyEnglish_bot
+
+### Autor
+##### Bruno Rafael de Oliveira da Silva
+##### Linkedin: https://www.linkedin.com/in/bruno-rafael-programador/
+##### Email: faellbrunim@gmail.com
