@@ -3,7 +3,7 @@ from telebot import types
 import random
 from openpyxl import load_workbook
 
-CHAVE_API = "Sua Chave API aqui"
+CHAVE_API = "7026978984:AAFxq_Qo4nuQG-J9B5yZYPbHGrQy8xMofnc"
 
 bot = telebot.TeleBot(CHAVE_API)
 
@@ -85,56 +85,56 @@ def verificar_dezena(numero):
         ab1 = aba_ativa['A21'].value
         ab2 = f'A{numero-19}'
         ab21 = aba_ativa[ab2].value
-        cel = f'{ab1}-{ab21}'
+        cel = f'{ab1} {ab21}'
         return cel
 
     elif numero > 30 and numero < 40:
         ab1 = aba_ativa['A22'].value
         ab2 = f'A{numero-29}'
         ab21 = aba_ativa[ab2].value
-        cel = f'{ab1}-{ab21}'
+        cel = f'{ab1} {ab21}'
         return cel
 
     elif numero > 40 and numero < 50:
         ab1 = aba_ativa['A23'].value
         ab2 = f'A{numero-39}'
         ab21 = aba_ativa[ab2].value
-        cel = f'{ab1}-{ab21}'
+        cel = f'{ab1} {ab21}'
         return cel
 
     elif numero > 50 and numero < 60:
         ab1 = aba_ativa['A24'].value
         ab2 = f'A{numero-49}'
         ab21 = aba_ativa[ab2].value
-        cel = f'{ab1}-{ab21}'
+        cel = f'{ab1} {ab21}'
         return cel
 
     elif numero > 60 and numero < 70:
         ab1 = aba_ativa['A25'].value
         ab2 = f'A{numero-59}'
         ab21 = aba_ativa[ab2].value
-        cel = f'{ab1}-{ab21}'
+        cel = f'{ab1} {ab21}'
         return cel
 
     elif numero > 70 and numero < 80:
         ab1 = aba_ativa['A26'].value
         ab2 = f'A{numero-69}'
         ab21 = aba_ativa[ab2].value
-        cel = f'{ab1}-{ab21}'
+        cel = f'{ab1} {ab21}'
         return cel
 
     elif numero > 80 and numero < 90:
         ab1 = aba_ativa['A27'].value
         ab2 = f'A{numero-79}'
         ab21 = aba_ativa[ab2].value
-        cel = f'{ab1}-{ab21}'
+        cel = f'{ab1} {ab21}'
         return cel
 
     elif numero > 90 and numero < 100:
         ab1 = aba_ativa['A28'].value
         ab2 = f'A{numero-89}'
         ab21 = aba_ativa[ab2].value
-        cel = f'{ab1}-{ab21}'
+        cel = f'{ab1} {ab21}'
         return cel
     
 def verificar_centena(numero):
@@ -145,118 +145,118 @@ def verificar_centena(numero):
     if numero == 100:
         ab1 = aba_ativa['A2'].value
         ab2 = aba_ativa['A29'].value
-        cel = f'{ab1}-{ab2}'
+        cel = f'{ab1} {ab2}'
         return cel
     
     if numero == 200:
         ab1 = aba_ativa['A3'].value
         ab2 = aba_ativa['A29'].value
-        cel = f'{ab1}-{ab2}'
+        cel = f'{ab1} {ab2}'
         return cel
     
     if numero == 300:
         ab1 = aba_ativa['A4'].value
         ab2 = aba_ativa['A29'].value
-        cel = f'{ab1}-{ab2}'
+        cel = f'{ab1} {ab2}'
         return cel
     
     if numero == 400:
         ab1 = aba_ativa['A5'].value
         ab2 = aba_ativa['A29'].value
-        cel = f'{ab1}-{ab2}'
+        cel = f'{ab1} {ab2}'
         return cel
     
     if numero == 500:
         ab1 = aba_ativa['A6'].value
         ab2 = aba_ativa['A29'].value
-        cel = f'{ab1}-{ab2}'
+        cel = f'{ab1} {ab2}'
         return cel
     
     if numero == 600:
         ab1 = aba_ativa['A7'].value
         ab2 = aba_ativa['A29'].value
-        cel = f'{ab1}-{ab2}'
+        cel = f'{ab1} {ab2}'
         return cel 
     
     if numero == 700:
         ab1 = aba_ativa['A8'].value
         ab2 = aba_ativa['A29'].value
-        cel = f'{ab1}-{ab2}'
+        cel = f'{ab1} {ab2}'
         return cel
     
     if numero == 800:
         ab1 = aba_ativa['A9'].value
         ab2 = aba_ativa['A29'].value
-        cel = f'{ab1}-{ab2}'
+        cel = f'{ab1} {ab2}'
         return cel
     
     if numero == 900:
         ab1 = aba_ativa['A10'].value
         ab2 = aba_ativa['A29'].value
-        cel = f'{ab1}-{ab2}'
+        cel = f'{ab1} {ab2}'
         return cel
         
     elif numero > 100 and numero < 200:
         ab1 = aba_ativa['A2'].value
         ab2 = aba_ativa['A29'].value
         ab3 = verificar_dezena(numero-100)
-        cel = f'{ab1}-{ab2} and {ab3}'
+        cel = f'{ab1} {ab2} {ab3}'
         return cel
 
     elif numero > 200 and numero < 300:
         ab1 = aba_ativa['A3'].value
         ab2 = aba_ativa['A29'].value
         ab3 = verificar_dezena(numero-200)
-        cel = f'{ab1}-{ab2} and {ab3}'
+        cel = f'{ab1} {ab2} {ab3}'
         return cel
     
     elif numero > 300 and numero < 400:
         ab1 = aba_ativa['A4'].value
         ab2 = aba_ativa['A29'].value
         ab3 = verificar_dezena(numero-300)
-        cel = f'{ab1}-{ab2} and {ab3}'
+        cel = f'{ab1} {ab2} {ab3}'
         return cel
 
     elif numero > 400 and numero < 500:
         ab1 = aba_ativa['A5'].value
         ab2 = aba_ativa['A29'].value
         ab3 = verificar_dezena(numero-400)
-        cel = f'{ab1}-{ab2} and {ab3}'
+        cel = f'{ab1} {ab2} {ab3}'
         return cel
     
     elif numero > 500 and numero < 600:
         ab1 = aba_ativa['A6'].value
         ab2 = aba_ativa['A29'].value
         ab3 = verificar_dezena(numero-500)
-        cel = f'{ab1}-{ab2} and {ab3}'
+        cel = f'{ab1} {ab2} {ab3}'
         return cel
     
     elif numero > 600 and numero < 700:
         ab1 = aba_ativa['A7'].value
         ab2 = aba_ativa['A29'].value
         ab3 = verificar_dezena(numero-600)
-        cel = f'{ab1}-{ab2} and {ab3}'
+        cel = f'{ab1} {ab2} {ab3}'
         return cel
     
     elif numero > 700 and numero < 800:
         ab1 = aba_ativa['A8'].value
         ab2 = aba_ativa['A29'].value
         ab3 = verificar_dezena(numero-700)
-        cel = f'{ab1}-{ab2} and {ab3}'
+        cel = f'{ab1} {ab2} {ab3}'
         return cel
 
     elif numero > 800 and numero < 900:
         ab1 = aba_ativa['A9'].value
         ab2 = aba_ativa['A29'].value
         ab3 = verificar_dezena(numero-800)
-        cel = f'{ab1}-{ab2} and {ab3}'
+        cel = f'{ab1} {ab2} {ab3}'
         return cel
 
     elif numero > 900 and numero < 1000:
         ab1 = aba_ativa['A10'].value
         ab2 = aba_ativa['A29'].value
         ab3 = verificar_dezena(numero-900)
-        cel = f'{ab1}-{ab2} and {ab3}'
+        cel = f'{ab1} {ab2} {ab3}'
         return cel
 
 def verificar_milhar(numero):
@@ -274,13 +274,13 @@ def verificar_milhar(numero):
         if centena == 0:
             ab1 = verificar_dezena(milhar)
             ab3 = verificar_dezena(dezena)
-            cel = f'{ab1}-thousand and {ab3}'
+            cel = f'{ab1} thousand {ab3}'
             return cel
         else:
             ab1 = verificar_dezena(milhar)
             ab2 = verificar_centena(centena)
             ab3 = verificar_dezena(dezena)
-            cel = f'{ab1}-thousand and {ab2} and {ab3}'
+            cel = f'{ab1} thousand {ab2} {ab3}'
             return cel
         
 def decidir_verificacao_number(numero):
