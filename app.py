@@ -3,7 +3,8 @@ from telebot import types
 import random
 from openpyxl import load_workbook
 
-CHAVE_API = "Sua Chave API Aqui"
+
+CHAVE_API = "Sua Chave API aqui"
 
 bot = telebot.TeleBot(CHAVE_API)
 
