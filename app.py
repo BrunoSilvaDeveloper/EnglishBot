@@ -343,7 +343,6 @@ def exibirHistoria(usuario):
     usuario[3] = frase[2]
 
     mensagem = usuario[1]
-    mensagem = usuario[1]
     resposta = f'História de Nível: {usuario[3]}🔥 \n\nEsta é a sua frase, bons estudos! \n\n{mensagem}'
     responder(usuario[0], resposta, [['Continuar','/OK']], 1)
     return usuario
@@ -393,12 +392,12 @@ def Numbers(mensagem, usuario):
     return usuario
 
 def VerificarNumberExtenso(mensagem, usuario):
-    if mensagem == decidir_verificacao_number(int(usuario[4])):
+    if mensagem.capitalize() == decidir_verificacao_number(int(usuario[4])):
                 resposta = f'Você acertou!'
                 usuario[5] = '/Aprender'
                 responder(usuario[0], resposta, [['Exibir Number', '/ExibirNumber'], ['Continuar','/OK']], 1)
     else:
-        extenso = decidir_verificacao_number(int(usuario[4]))
+        extenso = decidir_verificacao_number(int(usuario[4])).capitalize()
         resposta = f'Você errou! a traducao correta é: \n\n{extenso}'
         usuario[5] = '/Aprender'
         responder(usuario[0], resposta, [['Exibir Number', '/ExibirNumber'], ['Continuar','/OK']], 1)
