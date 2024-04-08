@@ -4,20 +4,75 @@ import random
 from openpyxl import load_workbook
 
 
-CHAVE_API = "Sua Chave API aqui"
+CHAVE_API = "Sua chave API"
 
 bot = telebot.TeleBot(CHAVE_API)
 
-def AlterarUsuario(usuario, linha):
+
+class User():
+    def __init__(self, id, frase, traducao, nivel, number, ultimoComando, fraseOrAprender):
+        self.__id = id
+        self.__frase = frase
+        self.__traducao = traducao
+        self.__nivel = nivel
+        self.__number = number
+        self.__ultimoComando = ultimoComando
+        self.__fraseOrAprender = fraseOrAprender
+
+    def get_id(self):
+        return self.__id
+    
+    def get_frase(self):
+        return self.__frase
+    
+    def get_traducao(self):
+        return self.__traducao
+    
+    def get_nivel(self):
+        return self.__nivel
+    
+    def get_number(self):
+        return self.__number
+    
+    def get_ultimoComando(self):
+        return self.__ultimoComando
+    
+    def get_fraseOrAprender(self):
+        return self.__fraseOrAprender
+    
+    def set_id(self, id):
+        self.__id = id
+
+    def set_frase(self, frase):
+        self.__frase = frase
+
+    def set_traducao(self, traducao):
+        self.__traducao = traducao
+
+    def set_nivel(self, nivel):
+        self.__nivel = nivel
+
+    def set_number(self, number):
+        self.__number = number
+
+    def set_ultimoComando(self, ultimoComando):
+        self.__ultimoComando = ultimoComando
+
+    def set_fraseOrAprender(self, fraseOrAprender):
+        self.__fraseOrAprender = fraseOrAprender
+
+
+
+def AlterarUsuario(user, linha):
     planilha = load_workbook('Usuarios.xlsx')
     aba_ativa = planilha.active
-    aba_ativa[f'A{linha}'] = usuario[0]
-    aba_ativa[f'B{linha}'] = usuario[1]
-    aba_ativa[f'C{linha}'] = usuario[2]
-    aba_ativa[f'D{linha}'] = usuario[3]
-    aba_ativa[f'E{linha}'] = usuario[4]
-    aba_ativa[f'F{linha}'] = usuario[5]
-    aba_ativa[f'G{linha}'] = usuario[6]
+    aba_ativa[f'A{linha}'] = user.get_id()
+    aba_ativa[f'B{linha}'] = user.get_frase()
+    aba_ativa[f'C{linha}'] = user.get_traducao()
+    aba_ativa[f'D{linha}'] = user.get_nivel()
+    aba_ativa[f'E{linha}'] = user.get_number()
+    aba_ativa[f'F{linha}'] = user.get_ultimoComando()
+    aba_ativa[f'G{linha}'] = user.get_fraseOrAprender()
     planilha.save('Usuarios.xlsx')
 
 def responder(id, resposta, buttons, qtd):
@@ -298,7 +353,7 @@ def decidir_verificacao_number(numero):
         return cel
 
 
-def receberFrases(nivel, choice):
+def receberFrases(nivel, choice, user):
     if nivel == None:
         nivel == 'Básico'
 
@@ -313,199 +368,206 @@ def receberFrases(nivel, choice):
 
     QtdFrases = len(aba_ativa['A'])
     number = random.randint(2, QtdFrases)
-    frase = [aba_ativa[f'B{number}'].value, aba_ativa[f'C{number}'].value, aba_ativa[f'D{number}'].value]
-    return frase
+    user.set_frase(aba_ativa[f'B{number}'].value)
+    user.set_traducao(aba_ativa[f'C{number}'].value)
+    user.set_nivel(aba_ativa[f'D{number}'].value)
 
-def exibirMenu(usuario):
+def exibirMenu(user):
+    id = user.get_id()
     resposta = f'Olá, seja muito bem vindo! 👋 \n\nEste é o nosso Menu 🏠'
-    responder(usuario[0], resposta, [['Exibir Frase', '/Frase'], ['Exibir História', '/Historia'], ['Traduzir Frase/História', '/Traducao'], ['Alterar Nível', '/Nivel'], ['Aprender Inglês', '/Aprender'], ['Nosso Propósito', '/Proposito']], 1)
+    responder(id, resposta, [['Exibir Frase', '/Frase'], ['Exibir História', '/Historia'], ['Traduzir Frase/História', '/Traducao'], ['Alterar Nível', '/Nivel'], ['Aprender Inglês', '/Aprender'], ['Nosso Propósito', '/Proposito']], 1)
 
-def exibirTraducao(usuario):
-    mensagem = usuario[2]
-    resposta = f'Esta é a sua tradução, espero que tenha acertado! 😊 \n\n{mensagem}'
-    responder(usuario[0], resposta, [['Continuar','/OK']], 1)
+def exibirTraducao(user):
+    traducao = user.get_traducao()
+    id = user.get_id()
+    resposta = f'Esta é a sua tradução, espero que tenha acertado! 😊 \n\n{traducao}'
+    responder(id, resposta, [['Continuar','/OK']], 1)
 
-def AlterarNivel(usuario, nivel):
+def AlterarNivel(user, nivel):
+    id = user.get_id()
+
     if nivel == 'Nivel':
         resposta = f'Escolha seu nível 🤗'
-        responder(usuario[0], resposta, [['Nível Básico','/Basico'], ['Nível Básico Avançado', '/BasicoAvancado'], ['Nível Intermediário', '/Intermediario'], ['Nível Intermediário Avançado', '/IntermediarioAvancado'], ['Nível Fluente', '/Fluente']], 1)
+        responder(id, resposta, [['Nível Básico','/Basico'], ['Nível Básico Avançado', '/BasicoAvancado'], ['Nível Intermediário', '/Intermediario'], ['Nível Intermediário Avançado', '/IntermediarioAvancado'], ['Nível Fluente', '/Fluente']], 1)
     
     else:
-        usuario[3] = nivel
+        user.set_nivel(nivel)
         resposta = f'Seu nível foi alterado para {nivel} 😉'
-        responder(usuario[0], resposta, [['Continuar','/OK']], 1)
+        responder(id, resposta, [['Continuar','/OK']], 1)
 
-    return usuario
 
-def exibirHistoria(usuario):
-    frase = receberFrases(usuario[3],'Historia')
-    usuario[1] = frase[0]
-    usuario[2] = frase[1]
-    usuario[3] = frase[2]
+def exibirHistoria(user):
+    nivel = user.get_nivel()
+    id = user.get_id()
+    receberFrases(nivel, 'Historia', user)
 
-    mensagem = usuario[1]
-    resposta = f'História de Nível: {usuario[3]}🔥 \n\nEsta é a sua frase, bons estudos! \n\n{mensagem}'
-    responder(usuario[0], resposta, [['Continuar','/OK']], 1)
-    return usuario
+    mensagem = user.get_frase()
+    nivel = user.get_nivel()
+    resposta = f'História de Nível: {nivel}🔥 \n\nEsta é a sua história, bons estudos! \n\n{mensagem}'
+    responder(id, resposta, [['Continuar','/OK']], 1)
 
-def exibirFrase(usuario):
-    frase = receberFrases(usuario[3], 'Frase')
-    usuario[1] = frase[0]
-    usuario[2] = frase[1]
-    usuario[3] = frase[2]
+def exibirFrase(user):
+    nivel = user.get_nivel()
+    id = user.get_id()
+    receberFrases(nivel, 'Frase', user)
 
- 
-    mensagem = usuario[1]
-    resposta = f'Frase de Nível: {usuario[3]}🔥 \n\nEsta é a sua frase, bons estudos! \n\n{mensagem}'
-    responder(usuario[0], resposta, [['Continuar','/OK']], 1)
-    return usuario
+    mensagem = user.get_frase()
+    nivel = user.get_nivel()
+    resposta = f'Frase de Nível: {nivel}🔥 \n\nEsta é a sua frase, bons estudos! \n\n{mensagem}'
+    responder(id, resposta, [['Continuar','/OK']], 1)
 
-def Numbers(mensagem, usuario):
+def Numbers(mensagem, user):
+    id = user.get_id()
+    number = user.get_number()
+
     if mensagem == '/Numbers':
         resposta = f'Você quer aprender sobre números?! 👋 \n\nSelecione o que deseja!'
-        responder(usuario[0], resposta, [['Conteúdo sobre Numbers', '/ConteudoNumbers'], ['Exibir Number', '/ExibirNumber']], 1)
+        responder(id, resposta, [['Conteúdo sobre Numbers', '/ConteudoNumbers'], ['Exibir Number', '/ExibirNumber']], 1)
         
 
     elif mensagem == '/ConteudoNumbers':
         planilha = load_workbook('Aprendendo.xlsx')
         aba_ativa = planilha['Numeros']
         resposta = aba_ativa['D1'].value
-        responder(usuario[0], resposta, [['Exibir Number', '/ExibirNumber'], ['Continuar','/OK']], 1)
+        responder(id, resposta, [['Exibir Number', '/ExibirNumber'], ['Continuar','/OK']], 1)
 
     elif mensagem == '/ExibirNumber':
         numero = gerar_numero()
-        usuario[4] = numero
+        user.set_number(numero)
         resposta = f'O número escolhido foi {numero} '
-        responder(usuario[0], resposta, [['Escrever por extenso', '/ExtensoNumbers'], ['Exibir Número Extenso', '/ExibirNumberExtenso'], ['Exibir Number', '/ExibirNumber'], ['Continuar','/OK']], 1)
+        responder(id, resposta, [['Escrever por extenso', '/ExtensoNumbers'], ['Exibir Número Extenso', '/ExibirNumberExtenso'], ['Exibir Number', '/ExibirNumber'], ['Continuar','/OK']], 1)
     
     elif mensagem == '/ExtensoNumbers':
-        usuario[5] = '/ExtensoNumbers'
+        user.set_ultimoComando('/ExtensoNumbers')
         resposta = f'Digite o número informado por extenso: '
-        responder_sem_button(usuario[0], resposta)
+        responder_sem_button(id, resposta)
 
     elif mensagem == '/ExibirNumberExtenso':
-        extenso = decidir_verificacao_number(int(usuario[4]))
-        resposta = f'\nO número {usuario[4]} por extenso é: \n\n{extenso}'
-        responder(usuario[0], resposta, [['Exibir Number', '/ExibirNumber'], ['Continuar','/OK']], 1)
+        extenso = decidir_verificacao_number(int(number))
+        resposta = f'\nO número {number} por extenso é: \n\n{extenso}'
+        responder(id, resposta, [['Exibir Number', '/ExibirNumber'], ['Continuar','/OK']], 1)
 
     
 
-    return usuario
+def VerificarNumberExtenso(mensagem, user):
+    number = user.get_number()
+    id = user.get_id()
 
-def VerificarNumberExtenso(mensagem, usuario):
-    if mensagem.capitalize() == decidir_verificacao_number(int(usuario[4])):
+    if mensagem.capitalize() == decidir_verificacao_number(int(number)):
                 resposta = f'Você acertou!'
-                usuario[5] = '/Aprender'
-                responder(usuario[0], resposta, [['Exibir Number', '/ExibirNumber'], ['Continuar','/OK']], 1)
+                user.set_ultimoComando('/Aprender')
+                responder(id, resposta, [['Exibir Number', '/ExibirNumber'], ['Continuar','/OK']], 1)
     else:
-        extenso = decidir_verificacao_number(int(usuario[4])).capitalize()
+        extenso = decidir_verificacao_number(int(number)).capitalize()
         resposta = f'Você errou! a traducao correta é: \n\n{extenso}'
-        usuario[5] = '/Aprender'
-        responder(usuario[0], resposta, [['Exibir Number', '/ExibirNumber'], ['Continuar','/OK']], 1)
+        user.set_ultimoComando('/Aprender')
+        responder(id, resposta, [['Exibir Number', '/ExibirNumber'], ['Continuar','/OK']], 1)
 
-    return usuario
 
-def verificarComandoFrases(mensagem, usuario):
+def verificarComandoFrases(mensagem, user):
+    id = user.get_id()
     if mensagem == '/Frase':
-        usuario = exibirFrase(usuario)
+        exibirFrase(user)
     
     elif mensagem == '/Historia':
-        usuario = exibirHistoria(usuario)
+        exibirHistoria(user)
     
     elif mensagem == '/Traducao':
-        exibirTraducao(usuario)
+        exibirTraducao(user)
     
     elif mensagem == '/Nivel':
         nivel = 'Nivel'
-        usuario = AlterarNivel(usuario, nivel)
+        AlterarNivel(user, nivel)
 
     elif mensagem == '/Basico':
         nivel = 'Básico'
-        usuario = AlterarNivel(usuario, nivel)
+        AlterarNivel(user, nivel)
     
     elif mensagem == '/BasicoAvancado':
         nivel = 'Básico Avançado'
-        usuario = AlterarNivel(usuario, nivel)
+        AlterarNivel(user, nivel)
     
     elif mensagem == '/Intermediario':
         nivel = 'Intermediário'
-        usuario = AlterarNivel(usuario, nivel)
+        AlterarNivel(user, nivel)
     
     elif mensagem == '/IntermediarioAvancado':
         nivel = 'Intermediário Avançado'
-        usuario = AlterarNivel(usuario, nivel)
+        AlterarNivel(user, nivel)
     
     elif mensagem == '/Fluente':
         nivel = 'Fluente'
-        usuario = AlterarNivel(usuario, nivel)
+        AlterarNivel(user, nivel)
 
     elif mensagem == '/Aprender':
-        usuario[6] = 'Aprender'
+        user.set_fraseOrAprender('Aprender')
         resposta = f'Que bom que você queira aprender! 👋 \n\nSelecione a materia que deseja aprender!'
-        responder(usuario[0], resposta, [['Numbers', '/Numbers']], 1)
+        responder(id, resposta, [['Numbers', '/Numbers']], 1)
         
     elif mensagem == '/Proposito':
         resposta = f'Olá, que bom que queira saber mais de nós 😊 \n\nNosso propósito é ajudar você a treinar e colocar em prática seus estudos de inglês. Eu forneço frases e histórias com o objetivo de você tentar traduzi-las. Depois, você pode verificar se acertou solicitando a tradução da frase ou história. \n\nNós surgimos da necessidade de um lugar onde pudéssemos treinar nossos aprendizados de forma prática, traduzindo pequenos textos ou frases, mas que estes estivessem no nosso nível de aprendizado. Muitas das vezes, outros lugares que tinham essas frases e histórias, não possuíam um nível equivalente ao nosso aprendizado. Dai eu surgi, com o objetivo de te ajudar a aprender cada vez mais. \n\nFico muito feliz de tê-lo por aqui! 😊😊'
-        responder(usuario[0], resposta, [['Continuar','/OK']], 1)
+        responder(id, resposta, [['Continuar','/OK']], 1)
 
     else:
-        exibirMenu(usuario)
+        exibirMenu(user)
 
-    return usuario
+def verificarComandoAprender(mensagem,user):
+    id = user.get_id()
+    ultimoComando = user.get_ultimoComando()
 
-def verificarComandoAprender(mensagem, usuario):
     if mensagem == '/Frase':
-        usuario[6] = 'Frase'
-        usuario = exibirFrase(usuario)
+        user.set_fraseOrAprender('Frase')
+        exibirFrase(user)
     
     elif mensagem == '/Historia':
-        usuario[6] = 'Frase'
-        usuario = exibirHistoria(usuario)
+        user.set_fraseOrAprender('Frase')
+        exibirHistoria(user)
     
     elif mensagem == '/Traducao':
-        usuario[6] = 'Frase'
-        exibirTraducao(usuario)
+        user.set_fraseOrAprender('Frase')
+        exibirTraducao(user)
     
     elif mensagem == '/Nivel':
         nivel = 'Nivel'
-        usuario[6] = 'Frase'
-        usuario = AlterarNivel(usuario, nivel)
+        user.set_fraseOrAprender('Frase')
+        AlterarNivel(user, nivel)
 
     elif mensagem == '/Aprender':
-        usuario[5] = '/Aprender'
+        user.set_ultimoComando('/Aprender')
         resposta =  f'Que bom que você queira aprender! 👋 \n\nSelecione a materia que deseja aprender!'
-        responder(usuario[0], resposta, [['Numbers', '/Numbers']], 1)
+        responder(id, resposta, [['Numbers', '/Numbers']], 1)
 
-    elif usuario[5] == '/Aprender':
+    elif ultimoComando == '/Aprender':
         if mensagem == '/Numbers' or mensagem == '/ConteudoNumbers' or mensagem == '/ExibirNumber' or mensagem == '/ExtensoNumbers' or mensagem == '/ExibirNumberExtenso':
-            usuario = Numbers(mensagem, usuario)
-        else:
-            usuario[5] == '/OK'
-            exibirMenu(usuario)
+            Numbers(mensagem, user)
+        else:  
+            user.set_ultimoComando('/OK') 
+            exibirMenu(user)
         
     elif mensagem == '/Proposito':
         resposta = f'Olá, que bom que queira saber mais de nós 😊 \n\nNosso propósito é ajudar você a treinar e colocar em prática seus estudos de inglês. Eu forneço frases e histórias com o objetivo de você tentar traduzi-las. Depois, você pode verificar se acertou solicitando a tradução da frase ou história. \n\nNós surgimos da necessidade de um lugar onde pudéssemos treinar nossos aprendizados de forma prática, traduzindo pequenos textos ou frases, mas que estes estivessem no nosso nível de aprendizado. Muitas das vezes, outros lugares que tinham essas frases e histórias, não possuíam um nível equivalente ao nosso aprendizado. Dai eu surgi, com o objetivo de te ajudar a aprender cada vez mais. \n\nFico muito feliz de tê-lo por aqui! 😊😊'
-        responder(usuario[0], resposta, [['Continuar','/OK']], 1)
+        responder(id, resposta, [['Continuar','/OK']], 1)
 
     else:
-        if usuario[5] == '/ExtensoNumbers':
-            usuario = VerificarNumberExtenso(mensagem, usuario)
+        if ultimoComando == '/ExtensoNumbers':
+            VerificarNumberExtenso(mensagem, user)
         else:
-            exibirMenu(usuario)
+            exibirMenu(user)
 
-    return usuario
+   
 
-def Section(mensagem, usuario):
-    if usuario[6] == 'Frase':
-        usuario = verificarComandoFrases(mensagem, usuario)
-    elif usuario[6] == 'Aprender':
-        usuario = verificarComandoAprender(mensagem, usuario)
+def Section(mensagem, user):
+    usuario = user.get_fraseOrAprender()
+    if usuario == 'Frase':
+        verificarComandoFrases(mensagem, user)
+    elif usuario == 'Aprender':
+        verificarComandoAprender(mensagem, user)
 
-    return usuario
 
-def registrarUsuario(usuario):
+def registrarUsuario(user):
     planilha = load_workbook('Usuarios.xlsx')
     aba_ativa = planilha.active
+    usuario = [user.get_id(), user.get_frase(), user.get_traducao(), user.get_nivel(), user.get_number(), user.get_ultimoComando(), user.get_fraseOrAprender()]
     aba_ativa.append(usuario)
     planilha.save('Usuarios.xlsx')
 
@@ -520,9 +582,9 @@ def UserInfo(id):
                 traducao = aba_ativa[f'C{linha}'].value
                 nivel = aba_ativa[f'D{linha}'].value
                 number = aba_ativa[f'E{linha}'].value
-                UltimaMensagem = aba_ativa[f'F{linha}'].value
+                UltimaComando = aba_ativa[f'F{linha}'].value
                 comando = aba_ativa[f'G{linha}'].value
-                return [id, frase, traducao, nivel, number, UltimaMensagem, comando], linha
+                return [id, frase, traducao, nivel, number, UltimaComando, comando], linha
    
 def receberListaUser():
     lista_id = []
@@ -552,15 +614,17 @@ def receber(mensagem):
     if verificarUsuario(id):
         print('Usuario existente')
         usuario, linha = UserInfo(id)
+        user = User(usuario[0], usuario[1], usuario[2], usuario[3], usuario[4], usuario[5], usuario[6])
     else:
         print('Usuario novo')
-        usuario = [id, 'Não existem frases', 'Não existem frases para traduzir, peça uma!', 'Básico', 0, '/OK', 'Frase']
-        registrarUsuario(usuario)
+        user = User(id, 'Não existem frases', 'Não existem frases para traduzir, peça uma!', 'Básico', 0, '/OK', 'Frase')
+        registrarUsuario(user)
         usuario, linha = UserInfo(id)
 
+
     
-    usuario = Section(mensagemUser, usuario)
-    AlterarUsuario(usuario, linha)
+    Section(mensagemUser, user)
+    AlterarUsuario(user, linha)
 
 @bot.callback_query_handler(func=lambda call:True)
 def receber_btn(callback):
@@ -570,14 +634,15 @@ def receber_btn(callback):
     if verificarUsuario(id):
         print('Usuario existente')
         usuario, linha = UserInfo(id)
+        user = User(usuario[0], usuario[1], usuario[2], usuario[3], usuario[4], usuario[5], usuario[6])
     else:
         print('Usuario novo')
-        usuario = [id, 'Não existem frases', 'Não existem frases para traduzir, peça uma!', 'Básico', 0, '/OK', 'Frases']
-        registrarUsuario(usuario)
+        user = User(id, 'Não existem frases', 'Não existem frases para traduzir, peça uma!', 'Básico', 0, '/OK', 'Frase')
+        registrarUsuario(user)
         usuario, linha = UserInfo(id)
 
-    usuario = Section(mensagemUser, usuario)
-    AlterarUsuario(usuario, linha)
+    Section(mensagemUser, user)
+    AlterarUsuario(user, linha)
 
 
 bot.polling()
