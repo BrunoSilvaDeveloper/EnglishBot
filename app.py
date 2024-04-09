@@ -1,11 +1,11 @@
 import telebot
 from telebot import types
-import random
 from openpyxl import load_workbook
 from MatériasFunctions.Numbers.Numbers import Numbers, VerificarNumberExtenso
+from FrasesHistorias.Frases import exibirFrase, exibirHistoria, exibirTraducao, AlterarNivel
 import os
 
-CHAVE_API = "Sua chave API"
+CHAVE_API = "Sua chave api aqui"
 
 bot = telebot.TeleBot(CHAVE_API)
 
@@ -95,70 +95,12 @@ def responder(id, resposta, buttons, qtd):
 def responder_sem_button(id, resposta):
     bot.send_message(id, resposta)   
 
-def receberFrases(nivel, choice, user):
-    if nivel == None:
-        nivel == 'Básico'
-
-    if choice == 'Frase':
-        caminho = carregar_planilha('Frases Ingles.xlsx')
-        planilha = load_workbook(caminho)
-        aba_ativa = planilha[nivel]
-
-    
-    elif choice == 'Historia':
-        caminho = carregar_planilha('Historias Ingles.xlsx')
-        planilha = load_workbook(caminho)
-        aba_ativa = planilha[nivel]
-
-    QtdFrases = len(aba_ativa['A'])
-    number = random.randint(2, QtdFrases)
-    user.set_frase(aba_ativa[f'B{number}'].value)
-    user.set_traducao(aba_ativa[f'C{number}'].value)
-    user.set_nivel(aba_ativa[f'D{number}'].value)
 
 def exibirMenu(user):
     id = user.get_id()
     resposta = f'Olá, seja muito bem vindo! 👋 \n\nEste é o nosso Menu 🏠'
     responder(id, resposta, [['Exibir Frase', '/Frase'], ['Exibir História', '/Historia'], ['Traduzir Frase/História', '/Traducao'], ['Alterar Nível', '/Nivel'], ['Aprender Inglês', '/Aprender'], ['Nosso Propósito', '/Proposito']], 1)
 
-def exibirTraducao(user):
-    traducao = user.get_traducao()
-    id = user.get_id()
-    resposta = f'Esta é a sua tradução, espero que tenha acertado! 😊 \n\n{traducao}'
-    responder(id, resposta, [['Continuar','/OK']], 1)
-
-def AlterarNivel(user, nivel):
-    id = user.get_id()
-
-    if nivel == 'Nivel':
-        resposta = f'Escolha seu nível 🤗'
-        responder(id, resposta, [['Nível Básico','/Basico'], ['Nível Básico Avançado', '/BasicoAvancado'], ['Nível Intermediário', '/Intermediario'], ['Nível Intermediário Avançado', '/IntermediarioAvancado'], ['Nível Fluente', '/Fluente']], 1)
-    
-    else:
-        user.set_nivel(nivel)
-        resposta = f'Seu nível foi alterado para {nivel} 😉'
-        responder(id, resposta, [['Continuar','/OK']], 1)
-
-
-def exibirHistoria(user):
-    nivel = user.get_nivel()
-    id = user.get_id()
-    receberFrases(nivel, 'Historia', user)
-
-    mensagem = user.get_frase()
-    nivel = user.get_nivel()
-    resposta = f'História de Nível: {nivel}🔥 \n\nEsta é a sua história, bons estudos! \n\n{mensagem}'
-    responder(id, resposta, [['Continuar','/OK']], 1)
-
-def exibirFrase(user):
-    nivel = user.get_nivel()
-    id = user.get_id()
-    receberFrases(nivel, 'Frase', user)
-
-    mensagem = user.get_frase()
-    nivel = user.get_nivel()
-    resposta = f'Frase de Nível: {nivel}🔥 \n\nEsta é a sua frase, bons estudos! \n\n{mensagem}'
-    responder(id, resposta, [['Continuar','/OK']], 1)
 
 def verificarComandoFrases(mensagem, user):
     id = user.get_id()

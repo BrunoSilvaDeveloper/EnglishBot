@@ -5,7 +5,7 @@ from openpyxl import load_workbook
 import os
 
 
-CHAVE_API = "Sua chave API"
+CHAVE_API = "Sua chave api aqui"
 
 bot = telebot.TeleBot(CHAVE_API)
 
@@ -20,7 +20,6 @@ def carregar_planilha():
     caminho_arquivo = os.path.join(pasta_database, 'Aprendendo.xlsx')
     return caminho_arquivo
 
-carregar_planilha()
 def responder(id, resposta, buttons, qtd):
     btn = []
     markup = types.InlineKeyboardMarkup(row_width=qtd)
