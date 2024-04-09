@@ -329,3 +329,23 @@ def VerificarNumberExtenso(mensagem, user):
         resposta = f'Você errou! a traducao correta é: \n\n{extenso}'
         user.set_ultimoComando('/Aprender')
         responder(id, resposta, [['Exibir Number', '/ExibirNumber'], ['Continuar','/OK']], 1)
+
+
+def receberFrases(nivel, choice, user):
+    if nivel == None:
+        nivel == 'Básico'
+
+    if choice == 'Frase':
+        planilha = load_workbook('DataBase\Frases Ingles.xlsx')
+        aba_ativa = planilha[nivel]
+
+    
+    elif choice == 'Historia':
+        planilha = load_workbook('DataBase\Historias Ingles.xlsx')
+        aba_ativa = planilha[nivel]
+
+    QtdFrases = len(aba_ativa['A'])
+    number = random.randint(2, QtdFrases)
+    user.set_frase(aba_ativa[f'B{number}'].value)
+    user.set_traducao(aba_ativa[f'C{number}'].value)
+    user.set_nivel(aba_ativa[f'D{number}'].value)
