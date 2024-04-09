@@ -2,7 +2,7 @@ import telebot
 from telebot import types
 import random
 from openpyxl import load_workbook
-
+from MatériasFunctions import Numbers as nb
 
 CHAVE_API = "Sua chave API"
 
@@ -64,7 +64,7 @@ class User():
 
 
 def AlterarUsuario(user, linha):
-    planilha = load_workbook('Usuarios.xlsx')
+    planilha = load_workbook('DataBase\Usuarios.xlsx')
     aba_ativa = planilha.active
     aba_ativa[f'A{linha}'] = user.get_id()
     aba_ativa[f'B{linha}'] = user.get_frase()
@@ -73,7 +73,7 @@ def AlterarUsuario(user, linha):
     aba_ativa[f'E{linha}'] = user.get_number()
     aba_ativa[f'F{linha}'] = user.get_ultimoComando()
     aba_ativa[f'G{linha}'] = user.get_fraseOrAprender()
-    planilha.save('Usuarios.xlsx')
+    planilha.save('DataBase\Usuarios.xlsx')
 
 def responder(id, resposta, buttons, qtd):
     btn = []
@@ -102,7 +102,7 @@ def gerar_numero():
         return random.randint(3001, 99999)
     
 def verificar_dezena(numero):
-    planilha = load_workbook('Aprendendo.xlsx')
+    planilha = load_workbook('DataBase\Aprendendo.xlsx')
     aba_ativa = planilha['Numeros']
 
     if numero >= 0 and numero < 21:
@@ -195,7 +195,7 @@ def verificar_dezena(numero):
     
 def verificar_centena(numero):
 
-    planilha = load_workbook('Aprendendo.xlsx')
+    planilha = load_workbook('DataBase\Aprendendo.xlsx')
     aba_ativa = planilha['Numeros']
 
     if numero == 100:
@@ -358,12 +358,12 @@ def receberFrases(nivel, choice, user):
         nivel == 'Básico'
 
     if choice == 'Frase':
-        planilha = load_workbook('Frases Ingles.xlsx')
+        planilha = load_workbook('DataBase\Frases Ingles.xlsx')
         aba_ativa = planilha[nivel]
 
     
     elif choice == 'Historia':
-        planilha = load_workbook('Historias Ingles.xlsx')
+        planilha = load_workbook('DataBase\Historias Ingles.xlsx')
         aba_ativa = planilha[nivel]
 
     QtdFrases = len(aba_ativa['A'])
@@ -426,7 +426,7 @@ def Numbers(mensagem, user):
         
 
     elif mensagem == '/ConteudoNumbers':
-        planilha = load_workbook('Aprendendo.xlsx')
+        planilha = load_workbook('DataBase\Aprendendo.xlsx')
         aba_ativa = planilha['Numeros']
         resposta = aba_ativa['D1'].value
         responder(id, resposta, [['Exibir Number', '/ExibirNumber'], ['Continuar','/OK']], 1)
@@ -565,14 +565,14 @@ def Section(mensagem, user):
 
 
 def registrarUsuario(user):
-    planilha = load_workbook('Usuarios.xlsx')
+    planilha = load_workbook('DataBase\Usuarios.xlsx')
     aba_ativa = planilha.active
     usuario = [user.get_id(), user.get_frase(), user.get_traducao(), user.get_nivel(), user.get_number(), user.get_ultimoComando(), user.get_fraseOrAprender()]
     aba_ativa.append(usuario)
-    planilha.save('Usuarios.xlsx')
+    planilha.save('DataBase\Usuarios.xlsx')
 
 def UserInfo(id):
-    planilha = load_workbook('Usuarios.xlsx')
+    planilha = load_workbook('DataBase\Usuarios.xlsx')
     aba_ativa = planilha.active
     for celula in aba_ativa['A']:
         if type(celula.value) == int :
@@ -588,7 +588,7 @@ def UserInfo(id):
    
 def receberListaUser():
     lista_id = []
-    planilha = load_workbook('Usuarios.xlsx')
+    planilha = load_workbook('DataBase\Usuarios.xlsx')
     aba_ativa = planilha.active
     for celula in aba_ativa['A']:
       if type(celula.value) == int :
