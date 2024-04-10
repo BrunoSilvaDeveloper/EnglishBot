@@ -4,7 +4,7 @@ import random
 from openpyxl import load_workbook
 import os
 
-CHAVE_API = "Sua chave api aqui"
+CHAVE_API = "7135016676:AAHSSdbhBRy2haEVyIfBENO1yYwJKF8-6uI"
 
 bot = telebot.TeleBot(CHAVE_API)
 
@@ -57,7 +57,7 @@ def exibirTraducao(user):
     traducao = user.get_traducao()
     id = user.get_id()
     resposta = f'Esta é a sua tradução, espero que tenha acertado! 😊 \n\n{traducao}'
-    responder(id, resposta, [['Continuar','/OK']], 1)
+    responder(id, resposta, [['Continuar','/Menu']], 1)
 
 def AlterarNivel(user, nivel):
     id = user.get_id()
@@ -69,7 +69,7 @@ def AlterarNivel(user, nivel):
     else:
         user.set_nivel(nivel)
         resposta = f'Seu nível foi alterado para {nivel} 😉'
-        responder(id, resposta, [['Continuar','/OK']], 1)
+        responder(id, resposta, [['Continuar','/Menu']], 1)
 
 
 def exibirHistoria(user):
@@ -80,7 +80,7 @@ def exibirHistoria(user):
     mensagem = user.get_frase()
     nivel = user.get_nivel()
     resposta = f'História de Nível: {nivel}🔥 \n\nEsta é a sua história, bons estudos! \n\n{mensagem}'
-    responder(id, resposta, [['Continuar','/OK']], 1)
+    responder(id, resposta, [['Continuar','/Menu']], 1)
 
 def exibirFrase(user):
     nivel = user.get_nivel()
@@ -90,4 +90,4 @@ def exibirFrase(user):
     mensagem = user.get_frase()
     nivel = user.get_nivel()
     resposta = f'Frase de Nível: {nivel}🔥 \n\nEsta é a sua frase, bons estudos! \n\n{mensagem}'
-    responder(id, resposta, [['Continuar','/OK']], 1)
+    responder(id, resposta, [['Continuar','/Menu']], 1)

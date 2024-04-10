@@ -5,7 +5,7 @@ from openpyxl import load_workbook
 import os
 
 
-CHAVE_API = "Sua chave api aqui"
+CHAVE_API = "7135016676:AAHSSdbhBRy2haEVyIfBENO1yYwJKF8-6uI"
 
 bot = telebot.TeleBot(CHAVE_API)
 
@@ -305,7 +305,7 @@ def Numbers(mensagem, user):
 
     if mensagem == '/Numbers':
         resposta = f'Você quer aprender sobre números?! 👋 \n\nSelecione o que deseja!'
-        responder(id, resposta, [['Conteúdo sobre Numbers', '/ConteudoNumbers'], ['Exibir Number', '/ExibirNumber']], 1)
+        responder(id, resposta, [['Conteúdo sobre Numbers', '/ConteudoNumbers'], ['Exibir Number', '/ExibirNumber'], ['Matérias', '/Aprender'], ['Menu', '/OK']], 1)
         
 
     elif mensagem == '/ConteudoNumbers':
@@ -313,13 +313,13 @@ def Numbers(mensagem, user):
         planilha = load_workbook(caminho)
         aba_ativa = planilha['Numeros']
         resposta = aba_ativa['D1'].value
-        responder(id, resposta, [['Exibir Number', '/ExibirNumber'], ['Continuar','/OK']], 1)
+        responder(id, resposta, [['Exibir Number', '/ExibirNumber'], ['Matérias', '/Aprender'], ['Menu','/OK']], 1)
 
     elif mensagem == '/ExibirNumber':
         numero = gerar_numero()
         user.set_number(numero)
         resposta = f'O número escolhido foi {numero} '
-        responder(id, resposta, [['Escrever por extenso', '/ExtensoNumbers'], ['Exibir Número Extenso', '/ExibirNumberExtenso'], ['Exibir Number', '/ExibirNumber'], ['Continuar','/OK']], 1)
+        responder(id, resposta, [['Escrever por extenso', '/ExtensoNumbers'], ['Exibir Número Extenso', '/ExibirNumberExtenso'], ['Exibir Number', '/ExibirNumber'], ['Matérias', '/Aprender'], ['Menu','/OK']], 1)
     
     elif mensagem == '/ExtensoNumbers':
         user.set_ultimoComando('/ExtensoNumbers')
@@ -329,7 +329,7 @@ def Numbers(mensagem, user):
     elif mensagem == '/ExibirNumberExtenso':
         extenso = decidir_verificacao_number(int(number))
         resposta = f'\nO número {number} por extenso é: \n\n{extenso}'
-        responder(id, resposta, [['Exibir Number', '/ExibirNumber'], ['Continuar','/OK']], 1)
+        responder(id, resposta, [['Exibir Number', '/ExibirNumber'], ['Matérias', '/Aprender'], ['Menu','/OK']], 1)
 
 def VerificarNumberExtenso(mensagem, user):
     number = user.get_number()
@@ -338,9 +338,9 @@ def VerificarNumberExtenso(mensagem, user):
     if mensagem.capitalize() == decidir_verificacao_number(int(number)):
                 resposta = f'Você acertou!'
                 user.set_ultimoComando('/Aprender')
-                responder(id, resposta, [['Exibir Number', '/ExibirNumber'], ['Continuar','/OK']], 1)
+                responder(id, resposta, [['Exibir Number', '/ExibirNumber'], ['Matérias', '/Aprender'], ['Menu','/OK']], 1)
     else:
         extenso = decidir_verificacao_number(int(number)).capitalize()
         resposta = f'Você errou! a traducao correta é: \n\n{extenso}'
         user.set_ultimoComando('/Aprender')
-        responder(id, resposta, [['Exibir Number', '/ExibirNumber'], ['Continuar','/OK']], 1)
+        responder(id, resposta, [['Exibir Number', '/ExibirNumber'], ['Matérias', '/Aprender'], ['Menu','/OK']], 1)

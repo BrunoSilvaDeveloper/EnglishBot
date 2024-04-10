@@ -5,7 +5,7 @@ from MatériasFunctions.Numbers.Numbers import Numbers, VerificarNumberExtenso
 from FrasesHistorias.Frases import exibirFrase, exibirHistoria, exibirTraducao, AlterarNivel
 import os
 
-CHAVE_API = "Sua chave api aqui"
+CHAVE_API = "7135016676:AAHSSdbhBRy2haEVyIfBENO1yYwJKF8-6uI"
 
 bot = telebot.TeleBot(CHAVE_API)
 
@@ -99,10 +99,10 @@ def responder_sem_button(id, resposta):
 def exibirMenu(user):
     id = user.get_id()
     resposta = f'Olá, seja muito bem vindo! 👋 \n\nEste é o nosso Menu 🏠'
-    responder(id, resposta, [['Exibir Frase', '/Frase'], ['Exibir História', '/Historia'], ['Traduzir Frase/História', '/Traducao'], ['Alterar Nível', '/Nivel'], ['Aprender Inglês', '/Aprender'], ['Nosso Propósito', '/Proposito']], 1)
+    responder(id, resposta, [['Frases ou Histórias', '/FraseHistoria'], ['Aprender Inglês', '/Aprender'], ['Nosso Propósito', '/Proposito']], 1)
 
 
-def verificarComandoFrases(mensagem, user):
+def Frases(mensagem, user):
     id = user.get_id()
     if mensagem == '/Frase':
         exibirFrase(user)
@@ -139,8 +139,7 @@ def verificarComandoFrases(mensagem, user):
 
     elif mensagem == '/Aprender':
         user.set_fraseOrAprender('Aprender')
-        resposta = f'Que bom que você queira aprender! 👋 \n\nSelecione a materia que deseja aprender!'
-        responder(id, resposta, [['Numbers', '/Numbers']], 1)
+        verificarComandoAprender(mensagem, user)
         
     elif mensagem == '/Proposito':
         resposta = f'Olá, que bom que queira saber mais de nós 😊 \n\nNosso propósito é ajudar você a treinar e colocar em prática seus estudos de inglês. Eu forneço frases e histórias com o objetivo de você tentar traduzi-las. Depois, você pode verificar se acertou solicitando a tradução da frase ou história. \n\nNós surgimos da necessidade de um lugar onde pudéssemos treinar nossos aprendizados de forma prática, traduzindo pequenos textos ou frases, mas que estes estivessem no nosso nível de aprendizado. Muitas das vezes, outros lugares que tinham essas frases e histórias, não possuíam um nível equivalente ao nosso aprendizado. Dai eu surgi, com o objetivo de te ajudar a aprender cada vez mais. \n\nFico muito feliz de tê-lo por aqui! 😊😊'
@@ -153,27 +152,18 @@ def verificarComandoAprender(mensagem,user):
     id = user.get_id()
     ultimoComando = user.get_ultimoComando()
 
-    if mensagem == '/Frase':
+    if mensagem == '/FraseHistoria':
         user.set_fraseOrAprender('Frase')
-        exibirFrase(user)
-    
-    elif mensagem == '/Historia':
-        user.set_fraseOrAprender('Frase')
-        exibirHistoria(user)
-    
-    elif mensagem == '/Traducao':
-        user.set_fraseOrAprender('Frase')
-        exibirTraducao(user)
-    
-    elif mensagem == '/Nivel':
-        nivel = 'Nivel'
-        user.set_fraseOrAprender('Frase')
-        AlterarNivel(user, nivel)
+        verificarComandoFrases(mensagem, user)
 
+    elif mensagem == '/Frase' or mensagem == '/Historia' or mensagem == '/Traducao' or mensagem == '/Nivel':
+        user.set_fraseOrAprender('Frase')
+        Frases(mensagem, user)
+    
     elif mensagem == '/Aprender':
         user.set_ultimoComando('/Aprender')
         resposta =  f'Que bom que você queira aprender! 👋 \n\nSelecione a materia que deseja aprender!'
-        responder(id, resposta, [['Numbers', '/Numbers']], 1)
+        responder(id, resposta, [['Numbers', '/Numbers'], ['Menu', '/OK']], 1)
 
     elif ultimoComando == '/Aprender':
         if mensagem == '/Numbers' or mensagem == '/ConteudoNumbers' or mensagem == '/ExibirNumber' or mensagem == '/ExtensoNumbers' or mensagem == '/ExibirNumberExtenso':
@@ -192,6 +182,14 @@ def verificarComandoAprender(mensagem,user):
         else:
             exibirMenu(user)
 
+def verificarComandoFrases(mensagem,user):
+    id = user.get_id()
+    if mensagem == '/FraseHistoria' or mensagem == '/Menu':
+        resposta = f'Este é o nosso Menu de Frases e Histórias 🏠'
+        responder(id, resposta, [['Exibir Frase', '/Frase'], ['Exibir História', '/Historia'], ['Traduzir Frase/História', '/Traducao'], ['Alterar Nível', '/Nivel'], ['Nosso Propósito', '/Proposito'], ['Menu', '/OK']], 1)
+
+    else:
+        Frases(mensagem, user)
    
 
 def Section(mensagem, user):
