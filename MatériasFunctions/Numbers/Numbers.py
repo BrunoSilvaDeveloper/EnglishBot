@@ -2,11 +2,23 @@ import telebot
 from telebot import types
 import random
 from openpyxl import load_workbook
+import os
 
 
 CHAVE_API = "Sua chave API"
 
 bot = telebot.TeleBot(CHAVE_API)
+
+
+
+def carregar_planilha():
+    diretorio_atual = os.getcwd()
+    dir_atual = diretorio_atual.split('\\')
+    if dir_atual[-1] == 'Numbers':
+        os.chdir(os.path.dirname(os.path.dirname(diretorio_atual)))
+    pasta_database = os.path.join(diretorio_atual, 'DataBase')
+    caminho_arquivo = os.path.join(pasta_database, 'Aprendendo.xlsx')
+    return caminho_arquivo
 
 def responder(id, resposta, buttons, qtd):
     btn = []
@@ -35,7 +47,8 @@ def gerar_numero():
         return random.randint(3001, 99999)
     
 def verificar_dezena(numero):
-    planilha = load_workbook('..\DataBase\Aprendendo.xlsx')
+    caminho = carregar_planilha()
+    planilha = load_workbook(caminho)
     aba_ativa = planilha['Numeros']
 
     if numero >= 0 and numero < 21:
@@ -128,7 +141,8 @@ def verificar_dezena(numero):
     
 def verificar_centena(numero):
 
-    planilha = load_workbook('..\DataBase\Aprendendo.xlsx')
+    caminho = carregar_planilha()
+    planilha = load_workbook(caminho)
     aba_ativa = planilha['Numeros']
 
     if numero == 100:
@@ -291,20 +305,21 @@ def Numbers(mensagem, user):
 
     if mensagem == '/Numbers':
         resposta = f'Você quer aprender sobre números?! 👋 \n\nSelecione o que deseja!'
-        responder(id, resposta, [['Conteúdo sobre Numbers', '/ConteudoNumbers'], ['Exibir Number', '/ExibirNumber']], 1)
+        responder(id, resposta, [['Conteúdo sobre Numbers', '/ConteudoNumbers'], ['Exibir Number', '/ExibirNumber'], ['Matérias', '/Aprender'], ['Menu', '/OK']], 1)
         
 
     elif mensagem == '/ConteudoNumbers':
-        planilha = load_workbook('..\DataBase\Aprendendo.xlsx')
+        caminho = carregar_planilha()
+        planilha = load_workbook(caminho)
         aba_ativa = planilha['Numeros']
         resposta = aba_ativa['D1'].value
-        responder(id, resposta, [['Exibir Number', '/ExibirNumber'], ['Continuar','/OK']], 1)
+        responder(id, resposta, [['Exibir Number', '/ExibirNumber'], ['Matérias', '/Aprender'], ['Menu','/OK']], 1)
 
     elif mensagem == '/ExibirNumber':
         numero = gerar_numero()
         user.set_number(numero)
         resposta = f'O número escolhido foi {numero} '
-        responder(id, resposta, [['Escrever por extenso', '/ExtensoNumbers'], ['Exibir Número Extenso', '/ExibirNumberExtenso'], ['Exibir Number', '/ExibirNumber'], ['Continuar','/OK']], 1)
+        responder(id, resposta, [['Escrever por Extenso', '/ExtensoNumbers'], ['Exibir Número Extenso', '/ExibirNumberExtenso'], ['Exibir Number', '/ExibirNumber'], ['Matérias', '/Aprender'], ['Menu','/OK']], 1)
     
     elif mensagem == '/ExtensoNumbers':
         user.set_ultimoComando('/ExtensoNumbers')
@@ -314,7 +329,7 @@ def Numbers(mensagem, user):
     elif mensagem == '/ExibirNumberExtenso':
         extenso = decidir_verificacao_number(int(number))
         resposta = f'\nO número {number} por extenso é: \n\n{extenso}'
-        responder(id, resposta, [['Exibir Number', '/ExibirNumber'], ['Continuar','/OK']], 1)
+        responder(id, resposta, [['Exibir Number', '/ExibirNumber'], ['Matérias', '/Aprender'], ['Menu','/OK']], 1)
 
 def VerificarNumberExtenso(mensagem, user):
     number = user.get_number()
@@ -323,29 +338,9 @@ def VerificarNumberExtenso(mensagem, user):
     if mensagem.capitalize() == decidir_verificacao_number(int(number)):
                 resposta = f'Você acertou!'
                 user.set_ultimoComando('/Aprender')
-                responder(id, resposta, [['Exibir Number', '/ExibirNumber'], ['Continuar','/OK']], 1)
+                responder(id, resposta, [['Exibir Number', '/ExibirNumber'], ['Matérias', '/Aprender'], ['Menu','/OK']], 1)
     else:
         extenso = decidir_verificacao_number(int(number)).capitalize()
         resposta = f'Você errou! a traducao correta é: \n\n{extenso}'
         user.set_ultimoComando('/Aprender')
-        responder(id, resposta, [['Exibir Number', '/ExibirNumber'], ['Continuar','/OK']], 1)
-
-
-def receberFrases(nivel, choice, user):
-    if nivel == None:
-        nivel == 'Básico'
-
-    if choice == 'Frase':
-        planilha = load_workbook('DataBase\Frases Ingles.xlsx')
-        aba_ativa = planilha[nivel]
-
-    
-    elif choice == 'Historia':
-        planilha = load_workbook('DataBase\Historias Ingles.xlsx')
-        aba_ativa = planilha[nivel]
-
-    QtdFrases = len(aba_ativa['A'])
-    number = random.randint(2, QtdFrases)
-    user.set_frase(aba_ativa[f'B{number}'].value)
-    user.set_traducao(aba_ativa[f'C{number}'].value)
-    user.set_nivel(aba_ativa[f'D{number}'].value)
+        responder(id, resposta, [['Exibir Number', '/ExibirNumber'], ['Matérias', '/Aprender'], ['Menu','/OK']], 1)
