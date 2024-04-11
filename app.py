@@ -3,6 +3,7 @@ from telebot import types
 from openpyxl import load_workbook
 from MatériasFunctions.Numbers.Numbers import Numbers, VerificarNumberExtenso
 from FrasesHistorias.Frases import exibirFrase, exibirHistoria, exibirTraducao, AlterarNivel
+from MatériasFunctions.AlphabetPronunciation.AlphabetPronunciation import exibir_alfabeto
 import os
 
 CHAVE_API = "Sua chave API"
@@ -163,10 +164,15 @@ def verificarComandoAprender(mensagem,user):
     elif mensagem == '/Aprender':
         user.set_ultimoComando('/Aprender')
         resposta =  f'Que bom que você queira aprender! 👋 \n\nSelecione a materia que deseja aprender!'
-        responder(id, resposta, [['Numbers', '/Numbers'], ['Menu', '/OK']], 1)
+        responder(id, resposta, [['Alphabet', '/Alfabeto'], ['Numbers', '/Numbers'], ['Menu', '/OK']], 1)
 
     elif ultimoComando == '/Aprender':
-        if mensagem == '/Numbers' or mensagem == '/ConteudoNumbers' or mensagem == '/ExibirNumber' or mensagem == '/ExtensoNumbers' or mensagem == '/ExibirNumberExtenso':
+        alfabeto = ['/A', '/B', '/C', '/D', '/E', '/F', '/G', '/H', '/I', '/J', '/K', '/L', '/M', '/N', '/O', '/P', '/Q', '/R', '/S', '/T', '/U', '/V', '/W', '/X', '/Y', '/Z']
+
+        if mensagem == '/Alfabeto' or mensagem in alfabeto:
+            exibir_alfabeto(user, mensagem)
+
+        elif mensagem == '/Numbers' or mensagem == '/ConteudoNumbers' or mensagem == '/ExibirNumber' or mensagem == '/ExtensoNumbers' or mensagem == '/ExibirNumberExtenso':
             Numbers(mensagem, user)
         else:  
             user.set_ultimoComando('/OK') 
