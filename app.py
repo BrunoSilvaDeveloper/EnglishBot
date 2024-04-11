@@ -5,7 +5,7 @@ from MatériasFunctions.Numbers.Numbers import Numbers, VerificarNumberExtenso
 from FrasesHistorias.Frases import exibirFrase, exibirHistoria, exibirTraducao, AlterarNivel
 import os
 
-CHAVE_API = "7135016676:AAGYmejXKHhnP9j2MAZ2Uph5YT_lr3Tw_5c"
+CHAVE_API = "Sua chave API"
 
 bot = telebot.TeleBot(CHAVE_API)
 
