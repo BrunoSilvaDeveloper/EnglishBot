@@ -4,7 +4,7 @@ import random
 from openpyxl import load_workbook
 import os
 
-CHAVE_API = "Sua chave API"
+CHAVE_API = "7135016676:AAGYmejXKHhnP9j2MAZ2Uph5YT_lr3Tw_5c"
 
 bot = telebot.TeleBot(CHAVE_API)
 

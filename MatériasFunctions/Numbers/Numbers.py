@@ -5,7 +5,7 @@ from openpyxl import load_workbook
 import os
 
 
-CHAVE_API = "Sua chave API"
+CHAVE_API = "7135016676:AAGYmejXKHhnP9j2MAZ2Uph5YT_lr3Tw_5c"
 
 bot = telebot.TeleBot(CHAVE_API)
 
@@ -319,7 +319,7 @@ def Numbers(mensagem, user):
         numero = gerar_numero()
         user.set_number(numero)
         resposta = f'O número escolhido foi {numero} '
-        responder(id, resposta, [['Escrever por extenso', '/ExtensoNumbers'], ['Exibir Número Extenso', '/ExibirNumberExtenso'], ['Exibir Number', '/ExibirNumber'], ['Matérias', '/Aprender'], ['Menu','/OK']], 1)
+        responder(id, resposta, [['Escrever por Extenso', '/ExtensoNumbers'], ['Exibir Número Extenso', '/ExibirNumberExtenso'], ['Exibir Number', '/ExibirNumber'], ['Matérias', '/Aprender'], ['Menu','/OK']], 1)
     
     elif mensagem == '/ExtensoNumbers':
         user.set_ultimoComando('/ExtensoNumbers')
