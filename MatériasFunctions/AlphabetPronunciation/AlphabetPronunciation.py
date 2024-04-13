@@ -2,7 +2,7 @@ import telebot
 from telebot import types
 from openpyxl import load_workbook
 import os
-
+import random
 
 CHAVE_API = "Sua chave API"
 
@@ -60,17 +60,58 @@ def exibir_audio(user, letra):
         indexLetra = alfabeto.index(letra) + 1
         pronuncia = aba_ativa[f'B{indexLetra}'].value
         resposta = f'Letra: {letra}   Pronúncia: {pronuncia}'
-        responder(id, resposta, [['Exibir Alfabeto', '/Alfabeto'], ['Matérias', '/Aprender'], ['Menu', '/OK']] , 1)
+        responder(id, resposta, [['Alphabet Pronunciation', '/Alfabet'], ['Alphabet Training', '/TreinarAlfabeto'], ['Matérias', '/Aprender'], ['Menu', '/OK']] , 1)
     else:
         menu_letras(user)
         
-def exibir_alfabeto(user, mensagem):
-    alfabeto = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-    letra = mensagem.split('/')[1]
-    if letra in alfabeto:
-        exibir_audio(user, letra)
-    
+
+def verificar_pronuncia(user, mensagem):
+    letra = user.get_letra()
+    id = user.get_id()
+    if mensagem.upper() == letra:
+                resposta = f'Você acertou!'
+                user.set_ultimoComando('/Aprender')
+                responder(id, resposta, [['Exibir Letra', '/TreinarAlfabeto'], ['Matérias', '/Aprender'], ['Menu','/OK']], 1)
     else:
+        resposta = f'Você errou! a letra correta é: {letra}'
+        user.set_ultimoComando('/Aprender')
+        responder(id, resposta, [['Exibir Letra', '/TreinarAlfabeto'], ['Matérias', '/Aprender'], ['Menu','/OK']], 1)
+
+def treinar_pronuncia(user):
+    alfabeto = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+    id = user.get_id()
+    letra = alfabeto[random.randint(0, 25)]
+    user.set_letra(letra)
+    enviar_audio(id, letra)
+    resposta = f'Digite a letra exibida no audio: '
+    responder(id, resposta, [['Voltar', '/Alfabeto']], 1)
+    user.set_ultimoComando('/VerificarPronuncia')
+    
+
+def exibir_alfabeto(user, mensagem):
+    try:
+        alfabeto = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+        letra = mensagem.split('/')[1]
+        if letra in alfabeto:
+            exibir_audio(user, letra)
+        
+        else:
+            menu_letras(user)
+    except:
         menu_letras(user)
 
 
+def alphabet(user, mensagem):
+    id = user.get_id()
+    if mensagem == '/Alfabeto':
+        resposta = f'Selecione o que deseja!'
+        responder(id, resposta, [['Alphabet Pronunciation', '/Alfabet'],['Alphabet Training', '/TreinarAlfabeto'], ['Matérias', '/Aprender'], ['Menu','/OK']], 1)
+    
+    elif mensagem == '/TreinarAlfabeto':
+        treinar_pronuncia(user)
+    
+    elif mensagem == '/Alfabet':
+        menu_letras(user)
+
+    else:
+        exibir_alfabeto(user, mensagem)

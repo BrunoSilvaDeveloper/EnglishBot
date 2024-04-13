@@ -3,7 +3,7 @@ from telebot import types
 from openpyxl import load_workbook
 from MatériasFunctions.Numbers.Numbers import Numbers, VerificarNumberExtenso
 from FrasesHistorias.Frases import exibirFrase, exibirHistoria, exibirTraducao, AlterarNivel
-from MatériasFunctions.AlphabetPronunciation.AlphabetPronunciation import exibir_alfabeto
+from MatériasFunctions.AlphabetPronunciation.AlphabetPronunciation import alphabet, verificar_pronuncia
 import os
 
 CHAVE_API = "Sua chave API"
@@ -12,7 +12,7 @@ bot = telebot.TeleBot(CHAVE_API)
 
 
 class User():
-    def __init__(self, id, frase, traducao, nivel, number, ultimoComando, fraseOrAprender):
+    def __init__(self, id, frase, traducao, nivel, number, ultimoComando, fraseOrAprender, letra):
         self.__id = id
         self.__frase = frase
         self.__traducao = traducao
@@ -20,6 +20,7 @@ class User():
         self.__number = number
         self.__ultimoComando = ultimoComando
         self.__fraseOrAprender = fraseOrAprender
+        self.__letra = letra
 
     def get_id(self):
         return self.__id
@@ -42,6 +43,9 @@ class User():
     def get_fraseOrAprender(self):
         return self.__fraseOrAprender
     
+    def get_letra(self):
+        return self.__letra
+    
     def set_id(self, id):
         self.__id = id
 
@@ -63,6 +67,9 @@ class User():
     def set_fraseOrAprender(self, fraseOrAprender):
         self.__fraseOrAprender = fraseOrAprender
 
+    def set_letra(self, letra):
+        self.__letra = letra
+
 def carregar_planilha(pasta):
     diretorio_atual = os.getcwd()
     pasta_database = os.path.join(diretorio_atual, 'DataBase')
@@ -80,6 +87,7 @@ def AlterarUsuario(user, linha):
     aba_ativa[f'E{linha}'] = user.get_number()
     aba_ativa[f'F{linha}'] = user.get_ultimoComando()
     aba_ativa[f'G{linha}'] = user.get_fraseOrAprender()
+    aba_ativa[f'H{linha}'] = user.get_letra()
     planilha.save(caminho)
 
 def responder(id, resposta, buttons, qtd):
@@ -169,8 +177,8 @@ def verificarComandoAprender(mensagem,user):
     elif ultimoComando == '/Aprender':
         alfabeto = ['/A', '/B', '/C', '/D', '/E', '/F', '/G', '/H', '/I', '/J', '/K', '/L', '/M', '/N', '/O', '/P', '/Q', '/R', '/S', '/T', '/U', '/V', '/W', '/X', '/Y', '/Z']
 
-        if mensagem == '/Alfabeto' or mensagem in alfabeto:
-            exibir_alfabeto(user, mensagem)
+        if mensagem == '/Alfabeto' or mensagem in alfabeto or mensagem == '/TreinarAlfabeto' or mensagem == '/Alfabet':
+            alphabet(user, mensagem)
 
         elif mensagem == '/Numbers' or mensagem == '/ConteudoNumbers' or mensagem == '/ExibirNumber' or mensagem == '/ExtensoNumbers' or mensagem == '/ExibirNumberExtenso':
             Numbers(mensagem, user)
@@ -185,6 +193,10 @@ def verificarComandoAprender(mensagem,user):
     else:
         if ultimoComando == '/ExtensoNumbers':
             VerificarNumberExtenso(mensagem, user)
+        
+        elif ultimoComando == '/VerificarPronuncia':
+            verificar_pronuncia(user, mensagem)	
+
         else:
             exibirMenu(user)
 
@@ -210,7 +222,7 @@ def registrarUsuario(user):
     caminho = carregar_planilha('Usuarios.xlsx')
     planilha = load_workbook(caminho)
     aba_ativa = planilha.active
-    usuario = [user.get_id(), user.get_frase(), user.get_traducao(), user.get_nivel(), user.get_number(), user.get_ultimoComando(), user.get_fraseOrAprender()]
+    usuario = [user.get_id(), user.get_frase(), user.get_traducao(), user.get_nivel(), user.get_number(), user.get_ultimoComando(), user.get_fraseOrAprender(), user.get_letra()]
     aba_ativa.append(usuario)
     planilha.save(caminho)
 
@@ -228,7 +240,8 @@ def UserInfo(id):
                 number = aba_ativa[f'E{linha}'].value
                 UltimaComando = aba_ativa[f'F{linha}'].value
                 comando = aba_ativa[f'G{linha}'].value
-                return [id, frase, traducao, nivel, number, UltimaComando, comando], linha
+                letra = aba_ativa[f'H{linha}'].value
+                return [id, frase, traducao, nivel, number, UltimaComando, comando, letra], linha
    
 def receberListaUser():
     lista_id = []
@@ -259,10 +272,10 @@ def receber(mensagem):
     if verificarUsuario(id):
         print('Usuario existente')
         usuario, linha = UserInfo(id)
-        user = User(usuario[0], usuario[1], usuario[2], usuario[3], usuario[4], usuario[5], usuario[6])
+        user = User(usuario[0], usuario[1], usuario[2], usuario[3], usuario[4], usuario[5], usuario[6], usuario[7])
     else:
         print('Usuario novo')
-        user = User(id, 'Não existem frases', 'Não existem frases para traduzir, peça uma!', 'Básico', 0, '/OK', 'Frase')
+        user = User(id, 'Não existem frases', 'Não existem frases para traduzir, peça uma!', 'Básico', 0, '/OK', 'Frase', 'A')
         registrarUsuario(user)
         usuario, linha = UserInfo(id)
 
@@ -279,10 +292,10 @@ def receber_btn(callback):
     if verificarUsuario(id):
         print('Usuario existente')
         usuario, linha = UserInfo(id)
-        user = User(usuario[0], usuario[1], usuario[2], usuario[3], usuario[4], usuario[5], usuario[6])
+        user = User(usuario[0], usuario[1], usuario[2], usuario[3], usuario[4], usuario[5], usuario[6], usuario[7])
     else:
         print('Usuario novo')
-        user = User(id, 'Não existem frases', 'Não existem frases para traduzir, peça uma!', 'Básico', 0, '/OK', 'Frase')
+        user = User(id, 'Não existem frases', 'Não existem frases para traduzir, peça uma!', 'Básico', 0, '/OK', 'Frase', 'A')
         registrarUsuario(user)
         usuario, linha = UserInfo(id)
 

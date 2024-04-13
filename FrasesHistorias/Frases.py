@@ -9,13 +9,13 @@ CHAVE_API = "Sua chave API"
 bot = telebot.TeleBot(CHAVE_API)
 
 
-def carregar_planilha(pasta):
+def carregar_planilha(arquivo):
     diretorio_atual = os.getcwd()
     dir_atual = diretorio_atual.split('\\')
     if dir_atual[-1] == 'FrasesHistorias':
         os.chdir(os.path.dirname(diretorio_atual))
     pasta_database = os.path.join(diretorio_atual, 'DataBase')
-    caminho_arquivo = os.path.join(pasta_database, pasta)
+    caminho_arquivo = os.path.join(pasta_database, arquivo)
     return caminho_arquivo
 
 
