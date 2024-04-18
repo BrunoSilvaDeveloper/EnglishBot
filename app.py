@@ -4,7 +4,9 @@ from openpyxl import load_workbook
 from MatériasFunctions.Numbers.Numbers import Numbers, VerificarNumberExtenso
 from FrasesHistorias.Frases import exibirFrase, exibirHistoria, exibirTraducao, AlterarNivel
 from MatériasFunctions.AlphabetPronunciation.AlphabetPronunciation import alphabet, verificar_pronuncia
+from AcessarBancos.AcessarBancoUsuarios import inserir_dados_user, alterar_dados_user, receber_dados_user, receber_lista_id
 import os
+
 
 CHAVE_API = "Sua chave API"
 
@@ -12,7 +14,7 @@ bot = telebot.TeleBot(CHAVE_API)
 
 
 class User():
-    def __init__(self, id, frase, traducao, nivel, number, ultimoComando, fraseOrAprender, letra):
+    def __init__(self, id, frase, traducao, nivel, ultimoComando, fraseOrAprender, letra, number):
         self.__id = id
         self.__frase = frase
         self.__traducao = traducao
@@ -76,20 +78,6 @@ def carregar_planilha(pasta):
     caminho_arquivo = os.path.join(pasta_database, pasta)
     return caminho_arquivo
 
-def AlterarUsuario(user, linha):
-    caminho = carregar_planilha('Usuarios.xlsx')
-    planilha = load_workbook(caminho)
-    aba_ativa = planilha.active
-    aba_ativa[f'A{linha}'] = user.get_id()
-    aba_ativa[f'B{linha}'] = user.get_frase()
-    aba_ativa[f'C{linha}'] = user.get_traducao()
-    aba_ativa[f'D{linha}'] = user.get_nivel()
-    aba_ativa[f'E{linha}'] = user.get_number()
-    aba_ativa[f'F{linha}'] = user.get_ultimoComando()
-    aba_ativa[f'G{linha}'] = user.get_fraseOrAprender()
-    aba_ativa[f'H{linha}'] = user.get_letra()
-    planilha.save(caminho)
-
 def responder(id, resposta, buttons, qtd):
     btn = []
     markup = types.InlineKeyboardMarkup(row_width=qtd)
@@ -104,12 +92,10 @@ def responder(id, resposta, buttons, qtd):
 def responder_sem_button(id, resposta):
     bot.send_message(id, resposta)   
 
-
 def exibirMenu(user):
     id = user.get_id()
     resposta = f'Olá, seja muito bem vindo! 👋 \n\nEste é o nosso Menu 🏠'
     responder(id, resposta, [['Frases ou Histórias', '/FraseHistoria'], ['Aprender Inglês', '/Aprender'], ['Nosso Propósito', '/Proposito']], 1)
-
 
 def Frases(mensagem, user):
     id = user.get_id()
@@ -207,8 +193,7 @@ def verificarComandoFrases(mensagem,user):
         responder(id, resposta, [['Exibir Frase', '/Frase'], ['Exibir História', '/Historia'], ['Traduzir Frase/História', '/Traducao'], ['Alterar Nível', '/Nivel'], ['Nosso Propósito', '/Proposito'], ['Menu', '/OK']], 1)
 
     else:
-        Frases(mensagem, user)
-   
+        Frases(mensagem, user)  
 
 def Section(mensagem, user):
     usuario = user.get_fraseOrAprender()
@@ -217,44 +202,8 @@ def Section(mensagem, user):
     elif usuario == 'Aprender':
         verificarComandoAprender(mensagem, user)
 
-
-def registrarUsuario(user):
-    caminho = carregar_planilha('Usuarios.xlsx')
-    planilha = load_workbook(caminho)
-    aba_ativa = planilha.active
-    usuario = [user.get_id(), user.get_frase(), user.get_traducao(), user.get_nivel(), user.get_number(), user.get_ultimoComando(), user.get_fraseOrAprender(), user.get_letra()]
-    aba_ativa.append(usuario)
-    planilha.save(caminho)
-
-def UserInfo(id):
-    caminho = carregar_planilha('Usuarios.xlsx')
-    planilha = load_workbook(caminho)
-    aba_ativa = planilha.active
-    for celula in aba_ativa['A']:
-        if type(celula.value) == int :
-            if celula.value == id:
-                linha = celula.row
-                frase = aba_ativa[f'B{linha}'].value
-                traducao = aba_ativa[f'C{linha}'].value
-                nivel = aba_ativa[f'D{linha}'].value
-                number = aba_ativa[f'E{linha}'].value
-                UltimaComando = aba_ativa[f'F{linha}'].value
-                comando = aba_ativa[f'G{linha}'].value
-                letra = aba_ativa[f'H{linha}'].value
-                return [id, frase, traducao, nivel, number, UltimaComando, comando, letra], linha
-   
-def receberListaUser():
-    lista_id = []
-    caminho = carregar_planilha('Usuarios.xlsx')
-    planilha = load_workbook(caminho)
-    aba_ativa = planilha.active
-    for celula in aba_ativa['A']:
-      if type(celula.value) == int :
-        lista_id.append(celula.value)
-    return lista_id
-
 def verificarUsuario(id):
-    listaUsersId = receberListaUser()
+    listaUsersId = receber_lista_id('Usuarios.db')
     if id in listaUsersId:
         return True
     else: return False
@@ -262,6 +211,13 @@ def verificarUsuario(id):
 def verificar(mensagem):
     return True
 
+'''
+print(verificarUsuario(12345))
+print(receber_dados_user('Usuarios.db', 123))
+user = User(123, 'Peça uma!', 'Não existem frases para traduzir, peça uma!','Avancado', 1, '/OK', 'Aprender', 'C')
+#inserir_dados_user('Usuarios.db', user)
+#alterar_dados_user(user, 'Usuarios.db')
+'''
 
 @bot.message_handler(func=verificar)
 def receber(mensagem):
@@ -271,18 +227,18 @@ def receber(mensagem):
 
     if verificarUsuario(id):
         print('Usuario existente')
-        usuario, linha = UserInfo(id)
+        usuario = receber_dados_user('Usuarios.db', id)
         user = User(usuario[0], usuario[1], usuario[2], usuario[3], usuario[4], usuario[5], usuario[6], usuario[7])
     else:
         print('Usuario novo')
-        user = User(id, 'Não existem frases', 'Não existem frases para traduzir, peça uma!', 'Básico', 0, '/OK', 'Frase', 'A')
-        registrarUsuario(user)
-        usuario, linha = UserInfo(id)
+        user = User(id, 'Não existem frases', 'Não existem frases para traduzir, peça uma!', 'Básico', '/OK', 'Frase', 'A', 0)
+        inserir_dados_user('Usuarios.db', user)
+        usuario = receber_dados_user('Usuarios.db', id)
 
 
     
     Section(mensagemUser, user)
-    AlterarUsuario(user, linha)
+    alterar_dados_user(user, 'Usuarios.db')
 
 @bot.callback_query_handler(func=lambda call:True)
 def receber_btn(callback):
@@ -291,16 +247,16 @@ def receber_btn(callback):
 
     if verificarUsuario(id):
         print('Usuario existente')
-        usuario, linha = UserInfo(id)
+        usuario = receber_dados_user('Usuarios.db', id)
         user = User(usuario[0], usuario[1], usuario[2], usuario[3], usuario[4], usuario[5], usuario[6], usuario[7])
     else:
         print('Usuario novo')
-        user = User(id, 'Não existem frases', 'Não existem frases para traduzir, peça uma!', 'Básico', 0, '/OK', 'Frase', 'A')
-        registrarUsuario(user)
-        usuario, linha = UserInfo(id)
+        user = User(id, 'Não existem frases', 'Não existem frases para traduzir, peça uma!', 'Básico', '/OK', 'Frase', 'A', 0)
+        inserir_dados_user('Usuarios.db', user)
+        usuario = receber_dados_user('Usuarios.db', id)
 
     Section(mensagemUser, user)
-    AlterarUsuario(user, linha)
+    alterar_dados_user(user, 'Usuarios.db')
 
 
 bot.polling()

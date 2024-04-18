@@ -1,5 +1,60 @@
 from openpyxl import load_workbook
 import sqlite3
+import os
+
+def caminho_db(db_name):
+    diretorio_atual = os.getcwd()
+    dir_atual = diretorio_atual.split('\\')
+    if dir_atual[-1] == 'AcessarBancos':
+        os.chdir(os.path.dirname(diretorio_atual))
+    pasta_database = os.path.join(diretorio_atual, 'DataBase')
+    caminho_arquivo = os.path.join(pasta_database, db_name)
+    return caminho_arquivo
+
+def inserir_dados_user(db_name, user):
+    caminho = caminho_db(db_name)
+    db = sqlite3.connect(caminho)
+    Usuarios_db = db.cursor()
+    Usuarios_db.execute('INSERT INTO DadosFrases (Id, Frase, Traducao, Nivel) VALUES (?, ?, ?, ?)', (user.get_id(), user.get_frase(), user.get_traducao(),user.get_nivel()))
+    Usuarios_db.execute('INSERT INTO DadosAprender (Id, UltimoComando, FrasesAprender, Letra, Number) VALUES (?, ?, ?, ?, ?)', (user.get_id(), user.get_ultimoComando(), user.get_fraseOrAprender(), user.get_letra(), user.get_number()))
+    db.commit()
+    db.close()
+
+def receber_dados_user(db_name, id):
+    caminho = caminho_db(db_name)
+    db = sqlite3.connect(caminho)
+    Usuarios_db = db.cursor()
+    query = f'SELECT df.Id, df.Frase, df.Traducao, df.Nivel, da.UltimoComando, da.FrasesAprender, da.Letra, da.Number FROM DadosFrases as df INNER JOIN DadosAprender as da ON df.Id = da.Id WHERE df.Id == {id}'
+    Usuarios_db.execute(query)
+    dados = Usuarios_db.fetchall()
+    lista_dados = []
+    for tupla in dados:
+        lista_dados.extend(tupla)
+    db.close()
+    return lista_dados
+
+def receber_lista_id(db_name):
+    lista_id = []
+    caminho = caminho_db(db_name)
+    db = sqlite3.connect(caminho)
+    Usuarios_db = db.cursor()
+    query = f'SELECT id FROM DadosAprender'
+    Usuarios_db.execute(query)
+    for x in Usuarios_db.fetchall():
+        lista_id.append(x[0])
+    db.close()
+    return lista_id
+
+def alterar_dados_user(user, db_name):
+    caminho = caminho_db(db_name)
+    db = sqlite3.connect(caminho)
+    Usuarios_db = db.cursor()
+    Usuarios_db.execute('UPDATE DadosFrases SET Frase = ?, Traducao = ?, Nivel = ? WHERE id = ? ', (user.get_frase(), user.get_traducao(), user.get_nivel(), user.get_id()))
+    Usuarios_db.execute('UPDATE DadosAprender SET UltimoComando = ?, FrasesAprender = ?, Letra = ?, Number = ? WHERE id = ? ', (user.get_ultimoComando(), user.get_fraseOrAprender(), user.get_letra(), user.get_number(), user.get_id()))
+    db.commit()
+    db.close()
+
+
 
 def acessar_planilha():
     planilha = load_workbook('Usuarios.xlsx')
@@ -15,54 +70,21 @@ def acessar_planilha():
             UltimoComando = aba_ativa[f'F{linha}'].value
             frasesAprender = aba_ativa[f'G{linha}'].value
             letra = aba_ativa[f'H{linha}'].value
-            inserir_dados([id, frase, traducao, nivel, UltimoComando, frasesAprender, letra, number])
+            inserir_dados_user([id, frase, traducao, nivel, UltimoComando, frasesAprender, letra, number])
 
-def criar_tabela():
-    db = sqlite3.connect('Usuarios.db')
+def criar_tabela(db_name):
+    caminho = caminho_db(db_name)
+    db = sqlite3.connect(caminho)
     Usuarios_db = db.cursor()
     Usuarios_db.execute('CREATE TABLE DadosFrases (Id integer, Frase text, Traducao text, Nivel text)')
     Usuarios_db.execute('CREATE TABLE DadosAprender (Id integer, UltimoComando text, FrasesAprender text, Letra text, Number integer)')
     print('Tabela criada com sucesso')
     db.close()
 
-def inserir_dados(dados):
-    db = sqlite3.connect('Usuarios.db')
-    Usuarios_db = db.cursor()
-    id, frase, traducao, nivel, ultimoComando, frasesAprender, letra, number = dados
-    Usuarios_db.execute('INSERT INTO DadosFrases (Id, Frase, Traducao, Nivel) VALUES (?, ?, ?, ?)', (id, frase, traducao, nivel))
-    Usuarios_db.execute('INSERT INTO DadosAprender (Id, UltimoComando, FrasesAprender, Letra, Number) VALUES (?, ?, ?, ?, ?)', (id, ultimoComando, frasesAprender, letra, number))
-    db.commit()
-    db.close()
-
-def receber_dados(tabela):
-    db = sqlite3.connect('Usuarios.db')
-    Usuarios_db = db.cursor()
-    if tabela == 'DadosFrases':
-        Usuarios_db.execute('SELECT * FROM DadosFrases')
-
-    elif tabela == 'DadosAprender':
-        Usuarios_db.execute('SELECT * FROM DadosAprender')
-
-    elif tabela == 'Todas':
-        Usuarios_db.execute('SELECT df.Id, df.Frase, df.Traducao, df.Nivel, da.UltimoComando, da.FrasesAprender, da.Letra, da.Number FROM DadosFrases as df INNER JOIN DadosAprender as da ON df.Id = da.Id')
-
-    dados = Usuarios_db.fetchall()
-    db.close()
-    return dados
-
-def receber_lista_id(tabela):
-    lista_id = []
-    db = sqlite3.connect('Usuarios.db')
-    Usuarios_db = db.cursor()
-    Usuarios_db.execute('SELECT id FROM DadosFrases')
-    for x in Usuarios_db.fetchall():
-        lista_id.append(x[0])
-    db.close()
-    return lista_id
-
-def deletar_dados():
+def deletar_dados(db_name):
     try:
-        db = sqlite3.connect('Usuarios.db')
+        caminho = caminho_db(db_name)
+        db = sqlite3.connect(caminho)
         Usuarios_db = db.cursor()
         Usuarios_db.execute('DELETE from DadosFrases')
         Usuarios_db.execute('DELETE from DadosAprender')
@@ -72,12 +94,3 @@ def deletar_dados():
     except sqlite3.Error as error:
         print(f'Erro ao deletar os dados: {error}')
 
-
-def alterar_dados(dados, user):
-    frase, traducao, nivel, ultimoComando, frasesAprender, letra, number = dados
-    db = sqlite3.connect('Usuarios.db')
-    Usuarios_db = db.cursor()
-    Usuarios_db.execute('UPDATE DadosFrases SET Frase = ?, Traducao = ?, Nivel = ? WHERE id = ? ', (frase, traducao, nivel, user))
-    Usuarios_db.execute('UPDATE DadosAprender SET UltimoComando = ?, FrasesAprender = ?, Letra = ?, Number = ? WHERE id = ? ', (ultimoComando, frasesAprender, letra, number, user))
-    db.commit()
-    db.close()
