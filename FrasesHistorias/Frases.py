@@ -1,23 +1,12 @@
 import telebot
 from telebot import types
-import random
 from openpyxl import load_workbook
+from AcessarBancos.AcessarBancoFrasesHistorias import receber_dados_FH
 import os
 
 CHAVE_API = "Sua chave API"
 
 bot = telebot.TeleBot(CHAVE_API)
-
-
-def carregar_planilha(arquivo):
-    diretorio_atual = os.getcwd()
-    dir_atual = diretorio_atual.split('\\')
-    if dir_atual[-1] == 'FrasesHistorias':
-        os.chdir(os.path.dirname(diretorio_atual))
-    pasta_database = os.path.join(diretorio_atual, 'DataBase')
-    caminho_arquivo = os.path.join(pasta_database, arquivo)
-    return caminho_arquivo
-
 
 def responder(id, resposta, buttons, qtd):
     btn = []
@@ -30,28 +19,20 @@ def responder(id, resposta, buttons, qtd):
 
     bot.send_message(id, resposta, reply_markup=markup)   
 
-
 def receberFrases(nivel, choice, user):
     if nivel == None:
-        nivel == 'Básico'
+        nivel == 'Basico'
 
     if choice == 'Frase':
-        caminho = carregar_planilha('Frases Ingles.xlsx')
-        planilha = load_workbook(caminho)
-        aba_ativa = planilha[nivel]
+        frase, traducao, nivel = receber_dados_FH(nivel, 'Frases.db')
 
     
     elif choice == 'Historia':
-        caminho = carregar_planilha('Historias Ingles.xlsx')
-        planilha = load_workbook(caminho)
-        aba_ativa = planilha[nivel]
+        frase, traducao, nivel = receber_dados_FH(nivel, 'Historias.db')
 
-    QtdFrases = len(aba_ativa['A'])
-    number = random.randint(2, QtdFrases)
-    user.set_frase(aba_ativa[f'B{number}'].value)
-    user.set_traducao(aba_ativa[f'C{number}'].value)
-    user.set_nivel(aba_ativa[f'D{number}'].value)
-
+    user.set_frase(frase)
+    user.set_traducao(traducao)
+    user.set_nivel(nivel)
 
 def exibirTraducao(user):
     traducao = user.get_traducao()
@@ -70,7 +51,6 @@ def AlterarNivel(user, nivel):
         user.set_nivel(nivel)
         resposta = f'Seu nível foi alterado para {nivel} 😉'
         responder(id, resposta, [['Continuar','/Menu']], 1)
-
 
 def exibirHistoria(user):
     nivel = user.get_nivel()

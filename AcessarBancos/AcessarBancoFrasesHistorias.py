@@ -1,5 +1,17 @@
 from openpyxl import load_workbook
 import sqlite3
+import os
+
+
+def caminho_db(db_name):
+    diretorio_atual = os.getcwd()
+    dir_atual = diretorio_atual.split('\\')
+    if dir_atual[-1] == 'AcessarBancos':
+        os.chdir(os.path.dirname(diretorio_atual))
+    pasta_database = os.path.join(diretorio_atual, 'DataBase')
+    caminho_arquivo = os.path.join(pasta_database, db_name)
+    return caminho_arquivo
+
 
 def acessar_planilha(aba, db, tabela):
     planilha = load_workbook('Historias Ingles.xlsx')
@@ -40,31 +52,31 @@ def adicionar_colunas(Tabela, Coluna, tipoDado, db):
     print('Tabela Alterada com sucesso')
     db.close()
 
-def receber_dados(tabela):
-    db = sqlite3.connect('Usuarios.db')
+def receber_dados_FH(tabela, db_name):
+    caminho = caminho_db(db_name)
+    db = sqlite3.connect(caminho)
     Usuarios_db = db.cursor()
-    if tabela == 'DadosFrases':
-        Usuarios_db.execute('SELECT * FROM DadosFrases')
+    if tabela == 'Basico':
+        Usuarios_db.execute('SELECT * FROM Basico ORDER BY RANDOM() LIMIT 1')
 
-    elif tabela == 'DadosAprender':
-        Usuarios_db.execute('SELECT * FROM DadosAprender')
+    elif tabela == 'Basico Avancado':
+        Usuarios_db.execute('SELECT * FROM Basico_Avancado ORDER BY RANDOM() LIMIT 1')
 
-    elif tabela == 'Todas':
-        Usuarios_db.execute('SELECT df.Id, df.Frase, df.Traducao, df.Nivel, da.UltimoComando, da.FrasesAprender, da.Letra, da.Number FROM DadosFrases as df INNER JOIN DadosAprender as da ON df.Id = da.Id')
+    elif tabela == 'Intermediario':
+        Usuarios_db.execute('SELECT * FROM Intermediario ORDER BY RANDOM() LIMIT 1')
 
+    elif tabela == 'Intermediario Avancado':
+        Usuarios_db.execute('SELECT * FROM Intermediario_Avancado ORDER BY RANDOM() LIMIT 1')
+
+    elif tabela == 'Fluente':
+        Usuarios_db.execute('SELECT * FROM Fluente ORDER BY RANDOM() LIMIT 1')
+    
     dados = Usuarios_db.fetchall()
+    lista_dados = []
+    for tupla in dados:
+        lista_dados.extend(tupla)
     db.close()
-    return dados
-
-def receber_lista_id(tabela):
-    lista_id = []
-    db = sqlite3.connect('Usuarios.db')
-    Usuarios_db = db.cursor()
-    Usuarios_db.execute('SELECT id FROM DadosFrases')
-    for x in Usuarios_db.fetchall():
-        lista_id.append(x[0])
-    db.close()
-    return lista_id
+    return lista_dados
 
 def deletar_dados(tabela, db):
     try:
@@ -79,17 +91,21 @@ def deletar_dados(tabela, db):
         print(f'Erro ao deletar os dados: {error}')
 
 
-def alterar_dados(dados, user):
-    frase, traducao, nivel, ultimoComando, frasesAprender, letra, number = dados
-    db = sqlite3.connect('Usuarios.db')
+def alterar_dados(db_name):
+    caminho = caminho_db(db_name)
+    db = sqlite3.connect(caminho)
     Usuarios_db = db.cursor()
-    Usuarios_db.execute('UPDATE DadosFrases SET Frase = ?, Traducao = ?, Nivel = ? WHERE id = ? ', (frase, traducao, nivel, user))
-    Usuarios_db.execute('UPDATE DadosAprender SET UltimoComando = ?, FrasesAprender = ?, Letra = ?, Number = ? WHERE id = ? ', (ultimoComando, frasesAprender, letra, number, user))
+    Usuarios_db.execute('UPDATE Basico SET Nivel = ? ', ('Basico',))
+    Usuarios_db.execute('UPDATE Basico_Avancado SET Nivel = ? ', ('Basico Avancado',))
+    Usuarios_db.execute('UPDATE Intermediario SET Nivel = ? ', ('Intermediario',))
+    Usuarios_db.execute('UPDATE Intermediario_Avancado SET Nivel = ? ', ('Intermediario Avancado',))
+    Usuarios_db.execute('UPDATE Fluente SET Nivel = ? ', ('Fluente',))
+
     db.commit()
     db.close()
 
 
-acessar_planilha('Intermediário', 'Historias.db', 'Intermediario') # aba, NomeBanco, Nometabela
+#acessar_planilha('Intermediário', 'Historias.db', 'Intermediario') # aba, NomeBanco, Nometabela
 #criar_tabela('Basico', '(Ingles text, Portugues text, Nivel text)')
 #deletar_dados('Basico', 'Frases.db')
 #adicionar_colunas('Numeros', 'Conteudo', 'Text', 'Aprendendo.db')

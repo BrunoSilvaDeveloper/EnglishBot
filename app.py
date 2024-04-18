@@ -72,12 +72,6 @@ class User():
     def set_letra(self, letra):
         self.__letra = letra
 
-def carregar_planilha(pasta):
-    diretorio_atual = os.getcwd()
-    pasta_database = os.path.join(diretorio_atual, 'DataBase')
-    caminho_arquivo = os.path.join(pasta_database, pasta)
-    return caminho_arquivo
-
 def responder(id, resposta, buttons, qtd):
     btn = []
     markup = types.InlineKeyboardMarkup(row_width=qtd)
@@ -113,19 +107,19 @@ def Frases(mensagem, user):
         AlterarNivel(user, nivel)
 
     elif mensagem == '/Basico':
-        nivel = 'Básico'
+        nivel = 'Basico'
         AlterarNivel(user, nivel)
     
     elif mensagem == '/BasicoAvancado':
-        nivel = 'Básico Avançado'
+        nivel = 'Basico Avancado'
         AlterarNivel(user, nivel)
     
     elif mensagem == '/Intermediario':
-        nivel = 'Intermediário'
+        nivel = 'Intermediario'
         AlterarNivel(user, nivel)
     
     elif mensagem == '/IntermediarioAvancado':
-        nivel = 'Intermediário Avançado'
+        nivel = 'Intermediario Avancado'
         AlterarNivel(user, nivel)
     
     elif mensagem == '/Fluente':
