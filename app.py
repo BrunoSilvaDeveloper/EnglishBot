@@ -13,6 +13,7 @@ CHAVE_API = "Sua chave API"
 bot = telebot.TeleBot(CHAVE_API)
 
 
+
 class User():
     def __init__(self, id, frase, traducao, nivel, ultimoComando, fraseOrAprender, letra, number):
         self.__id = id
